@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import {
   motion,
   useScroll,
   useMotionValueEvent,
   useSpring,
-  useTransform,
   AnimatePresence,
-  useInView,
 } from "framer-motion";
 import {
   ArrowUpRight,
@@ -22,7 +20,6 @@ import {
   Plus,
   Star,
   Play,
-  MousePointerClick,
   X,
   Sparkles,
   Users,
@@ -181,6 +178,32 @@ const Reveal = ({
 );
 
 /* ─────────── MARQUEE DATA ─────────── */
+/* ─────────── AVATAR COMPONENT ─────────── */
+const Avatar = ({
+  name,
+  bg = "bg-[#2563EB]",
+}: {
+  name: string;
+  bg?: string;
+}) => {
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2);
+  return (
+    <div
+      className={`w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] ${bg} flex items-center justify-center text-[10px] font-bold uppercase tracking-wider ${
+        bg === "bg-white" || bg === "bg-[#FBBF24]"
+          ? "text-[#0A0A0A]"
+          : "text-white"
+      }`}
+    >
+      {initials}
+    </div>
+  );
+};
+
 const baseMarqueePosts = [
   {
     name: "Muzan Y.",
@@ -188,8 +211,7 @@ const baseMarqueePosts = [
     text: "The future of SaaS isn't just wrapping LLMs. It's about deep workflow integration. Here is how we reduced churn by 40%...",
     metrics: "+12k Impr.",
     score: "99%",
-    color: "bg-[#FBBF24]",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
+    avatarBg: "bg-[#FBBF24]",
   },
   {
     name: "Sarah J.",
@@ -197,8 +219,7 @@ const baseMarqueePosts = [
     text: "Stop posting generic advice. The algorithm rewards vulnerability and hard data. We tested 100 variations of hooks this week...",
     metrics: "+8k Impr.",
     score: "94%",
-    color: "bg-[#2563EB]",
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
+    avatarBg: "bg-[#2563EB]",
   },
   {
     name: "David L.",
@@ -206,8 +227,7 @@ const baseMarqueePosts = [
     text: "Shipping features is easy. Solving the right problem is hard. After 5 years in product, here is the brutally honest framework...",
     metrics: "+15k Impr.",
     score: "97%",
-    color: "bg-white",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop",
+    avatarBg: "bg-[#0A0A0A]",
   },
   {
     name: "Elena Rivers",
@@ -215,8 +235,7 @@ const baseMarqueePosts = [
     text: "Your B2B marketing strategy is probably too boring. Professional doesn't mean lifeless. We injected humor into our cold outreach...",
     metrics: "+10k Impr.",
     score: "96%",
-    color: "bg-white",
-    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop",
+    avatarBg: "bg-[#E64833]",
   },
 ];
 const marqueePosts = [
@@ -236,165 +255,14 @@ export default function TrendMind() {
     damping: 30,
     restDelta: 0.001,
   });
-  const [navHidden, setNavHidden] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [activeFeature, setActiveFeature] = useState(0);
   const [showDemo, setShowDemo] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    setNavHidden(latest > 120 && latest > previous);
     setShowBackToTop(latest > 500);
   });
-
-  // Auto-cycle features
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % 4);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  /* ─── FEATURES DATA ─── */
-  const features = [
-    {
-      title: "Content Analytics",
-      desc: "Deep insights into what resonates with your audience.",
-      icon: <LineChart className="w-5 h-5" />,
-      bg: "bg-[#FBBF24]",
-      visual: (
-        <div className="w-full h-full flex flex-col justify-center items-center p-6 md:p-8">
-          <div className="flex items-end gap-3 md:gap-4 h-36 w-full justify-center mb-6">
-            {[40, 70, 45, 90, 60, 110, 85].map((h, i) => (
-              <motion.div
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: h }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="w-7 md:w-10 bg-[#0A0A0A] border-[3px] border-white rounded-t-lg"
-              />
-            ))}
-          </div>
-          <div className="text-2xl md:text-4xl font-bold tracking-tight">
-            +340% Engagement
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "AI Generation",
-      desc: "Data-driven post recommendations powered by AI.",
-      icon: <Zap className="w-5 h-5" />,
-      bg: "bg-[#2563EB]",
-      text: "text-white",
-      visual: (
-        <div className="w-full h-full flex flex-col justify-center items-center p-6 md:p-8 relative">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute w-32 h-32 border-[4px] border-dashed border-[#FBBF24] rounded-full opacity-50"
-          />
-          <div className="bg-white p-5 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[5px_5px_0px_0px_#0A0A0A] z-10 w-full max-w-xs text-left">
-            <div className="h-3 w-1/2 bg-gray-200 rounded-full mb-3" />
-            <div className="h-3 w-full bg-gray-200 rounded-full mb-2.5" />
-            <div className="h-3 w-full bg-gray-200 rounded-full mb-2.5" />
-            <div className="h-3 w-3/4 bg-gray-200 rounded-full mb-5" />
-            <motion.div
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="inline-block bg-[#2563EB] text-white px-4 py-1 rounded-full text-xs font-bold uppercase"
-            >
-              Generating...
-            </motion.div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Smart Scheduling",
-      desc: "Post at mathematically optimal times.",
-      icon: <Calendar className="w-5 h-5" />,
-      bg: "bg-white",
-      visual: (
-        <div className="w-full h-full flex flex-col justify-center items-center p-6 md:p-8">
-          <div className="grid grid-cols-4 gap-2.5 w-full max-w-xs">
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                animate={{
-                  scale: i === 5 || i === 8 ? [1, 1.1, 1] : 1,
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className={`aspect-square rounded-xl border-[3px] border-[#0A0A0A] flex items-center justify-center font-bold text-sm ${
-                  i === 5
-                    ? "bg-[#FBBF24]"
-                    : i === 8
-                      ? "bg-[#2563EB] text-white"
-                      : "bg-white"
-                }`}
-              >
-                {i + 10}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Trend Tracking",
-      desc: "Capitalize on formats before they peak.",
-      icon: <Activity className="w-5 h-5" />,
-      bg: "bg-white",
-      visual: (
-        <div className="w-full h-full flex flex-col justify-center items-center p-6 md:p-8">
-          <motion.div
-            animate={{ y: [-8, 8, -8] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="w-full max-w-xs bg-white border-[3px] border-[#0A0A0A] p-5 rounded-2xl shadow-[6px_6px_0px_0px_#FBBF24]"
-          >
-            <div className="flex justify-between items-center mb-5">
-              <div className="font-bold uppercase text-xs tracking-wider">
-                Viral Format #4
-              </div>
-              <Activity className="text-[#E64833] w-5 h-5" />
-            </div>
-            <div className="w-full h-20 border-b-[3px] border-l-[3px] border-[#0A0A0A] relative">
-              <svg
-                className="absolute inset-0 h-full w-full overflow-visible"
-                preserveAspectRatio="none"
-              >
-                <motion.path
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  d="M0,60 Q40,10 80,45 T160,8"
-                  fill="none"
-                  stroke="#2563EB"
-                  strokeWidth="5"
-                />
-              </svg>
-            </div>
-          </motion.div>
-        </div>
-      ),
-    },
-  ];
-
-  /* ─── STAGGER VARIANTS ─── */
-  const stagger = {
-    hidden: {},
-    show: {
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-  const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#0A0A0A] font-[family-name:var(--font-space-grotesk)] selection:bg-[#2563EB] selection:text-white overflow-x-hidden relative">
@@ -408,94 +276,233 @@ export default function TrendMind() {
         }}
       />
 
-      {/* ═══════════════ NAVBAR ═══════════════ */}
+      {/* ═══════════════ NAVBAR & MOBILE OVERLAY ═══════════════ */}
       <motion.nav
-        variants={{ visible: { y: 0 }, hidden: { y: "-100%" } }}
-        animate={navHidden ? "hidden" : "visible"}
-        transition={{ duration: 0.35, ease: "easeInOut" }}
-        className="fixed w-full top-0 z-50 bg-[#FAFAFA]/80 backdrop-blur-xl border-b-[3px] border-[#0A0A0A]"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="fixed w-full top-0 z-50 flex flex-col"
       >
-        <div className="px-5 lg:px-10 py-3.5 flex justify-between items-center">
-          <div className="flex items-center gap-8">
-            <a
-              href="#hero"
-              className="text-lg font-bold tracking-tight flex items-center gap-2 uppercase"
-            >
-              <TrendMindLogo />
-              TrendMind
-            </a>
-            <div className="hidden lg:flex gap-2 text-xs font-semibold uppercase tracking-wider">
-              {["About", "Features", "Pricing", "FAQ"].map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="px-4 py-2 rounded-full border-[2px] border-transparent hover:border-[#0A0A0A] hover:shadow-[3px_3px_0px_0px_#0A0A0A] hover:bg-white transition-all duration-200"
-                >
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="font-semibold text-xs uppercase hidden md:block hover:text-[#2563EB] transition-colors tracking-wider">
-              Sign In
-            </button>
-            <a
-              href="#pricing"
-              className="hidden sm:inline-flex bg-[#2563EB] text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase border-[2px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all"
-            >
-              Get Access
-            </a>
-            {/* Mobile menu toggle */}
-            <button
-              className="lg:hidden p-2 rounded-xl border-[2px] border-[#0A0A0A] bg-white"
-              onClick={() => setMobileMenu(!mobileMenu)}
-            >
-              {mobileMenu ? (
-                <XIcon className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-        </div>
-        {/* Scroll progress bar */}
-        <motion.div
-          className="h-[3px] bg-[#2563EB] origin-left"
-          style={{ scaleX }}
-        />
-        {/* Mobile menu dropdown */}
-        <AnimatePresence>
-          {mobileMenu && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="lg:hidden border-t-[3px] border-[#0A0A0A] bg-white overflow-hidden"
-            >
-              <div className="p-5 flex flex-col gap-3">
+        {/* Main Navbar Bar (Hidden when Mobile Menu is open) */}
+        {!mobileMenu && (
+          <div className="px-5 lg:px-10 py-3.5 flex justify-between items-center relative z-50 bg-white/90 backdrop-blur-xl border-b-[3px] border-[#0A0A0A]">
+            <div className="flex items-center gap-8">
+              <a
+                href="#hero"
+                className="text-lg font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A]"
+              >
+                <TrendMindLogo />
+                TrendMind
+              </a>
+              <div className="hidden lg:flex gap-2 text-xs font-bold uppercase tracking-wider">
                 {["About", "Features", "Pricing", "FAQ"].map((item) => (
                   <a
                     key={item}
                     href={`#${item.toLowerCase()}`}
-                    onClick={() => setMobileMenu(false)}
-                    className="px-4 py-3 rounded-xl border-[2px] border-[#0A0A0A] font-bold text-sm uppercase tracking-wider hover:bg-[#FBBF24] transition-colors"
+                    className="px-4 py-2 rounded-full border-[3px] border-transparent hover:border-[#0A0A0A] hover:shadow-[3px_3px_0px_0px_#0A0A0A] hover:bg-white transition-all duration-200 text-[#0A0A0A]"
                   >
                     {item}
                   </a>
                 ))}
-                <a
-                  href="#pricing"
-                  onClick={() => setMobileMenu(false)}
-                  className="px-4 py-3 rounded-xl border-[2px] border-[#0A0A0A] bg-[#2563EB] text-white font-bold text-sm uppercase tracking-wider text-center shadow-[3px_3px_0px_0px_#0A0A0A]"
-                >
-                  Get Access
-                </a>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+            <div className="flex items-center gap-4">
+              <button className="font-bold text-xs uppercase hidden md:block hover:text-[#2563EB] transition-colors tracking-wider">
+                Sign In
+              </button>
+
+              {/* Desktop Get Access Button with Arrow Icon */}
+              <a
+                href="#pricing"
+                className="hidden md:inline-flex items-center gap-2 bg-[#2563EB] text-white rounded-full px-6 py-2.5 text-xs font-black uppercase border-[3px] border-[#0A0A0A] shadow-[4px_4px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all"
+              >
+                Get Access <ArrowUpRight className="w-4 h-4" strokeWidth={3} />
+              </a>
+
+              {/* Mobile Menu Open Toggle */}
+              <button
+                className="lg:hidden p-2 rounded-[0.8rem] border-[3px] border-[#0A0A0A] bg-white text-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
+                onClick={() => setMobileMenu(true)}
+              >
+                <Menu className="w-5 h-5" strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Scroll progress bar */}
+        {!mobileMenu && (
+          <motion.div
+            className="h-[3px] bg-[#2563EB] origin-left relative z-50"
+            style={{ scaleX }}
+          />
+        )}
       </motion.nav>
+
+      {/* ═══════════════ EXACT MOBILE MENU TAKEOVER WITH ANIMATIONS ═══════════════ */}
+      <AnimatePresence>
+        {mobileMenu && (
+          <motion.div
+            initial={{ y: "-100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[100] bg-[#FAFAFA] flex flex-col overflow-hidden"
+          >
+            {/* Animated Background Elements (Grid & Shapes) */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+              {/* Background Grid */}
+              <div
+                className="absolute inset-0 opacity-[0.4]"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)",
+                  backgroundSize: "40px 40px",
+                }}
+              ></div>
+
+              {/* Floating Geometric Shapes */}
+              <motion.div
+                animate={{ y: [-15, 15, -15], rotate: [0, 10, 0] }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute top-32 -left-8 w-24 h-24 border-[3px] border-blue-200 rounded-full opacity-60"
+              ></motion.div>
+              <motion.div
+                animate={{ rotate: [0, 360], y: [0, -20, 0] }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="absolute bottom-40 -right-6 w-20 h-20 bg-red-100/50 rotate-45"
+              ></motion.div>
+            </div>
+
+            {/* Header */}
+            <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A] bg-white relative z-10">
+              <a
+                href="#hero"
+                onClick={() => setMobileMenu(false)}
+                className="text-xl font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A]"
+              >
+                <TrendMindLogo />
+                TrendMind
+              </a>
+              <button
+                className="p-1.5 rounded-[0.8rem] border-[3px] border-[#0A0A0A] bg-white text-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
+                onClick={() => setMobileMenu(false)}
+              >
+                <XIcon className="w-6 h-6" strokeWidth={2.5} />
+              </button>
+            </div>
+
+            {/* Massive Pill Buttons Container */}
+            <div className="flex-1 flex flex-col px-6 pt-10 pb-8 gap-5 overflow-y-auto relative z-10">
+              {["About", "Features", "Pricing", "FAQ"].map((item, i) => (
+                <motion.a
+                  key={item}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  href={`#${item.toLowerCase()}`}
+                  onClick={() => setMobileMenu(false)}
+                  className="w-full text-center py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] bg-white text-[#0A0A0A] font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
+                >
+                  {item}
+                </motion.a>
+              ))}
+
+              {/* Distinctive Blue Get Access Button WITH ICON */}
+              <motion.a
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                href="#pricing"
+                onClick={() => setMobileMenu(false)}
+                className="w-full flex items-center justify-center gap-2 py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] bg-[#2563EB] text-white font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all mt-2"
+              >
+                Get Access <ArrowUpRight className="w-5 h-5" strokeWidth={3} />
+              </motion.a>
+            </div>
+
+            {/* 4-Color Bottom Indicator Line */}
+            <div className="w-full h-1.5 flex mt-auto relative z-10">
+              <div className="h-full bg-[#2563EB] w-1/4"></div>
+              <div className="h-full bg-[#FBBF24] w-1/4"></div>
+              <div className="h-full bg-[#E64833] w-1/4"></div>
+              <div className="h-full bg-[#0A0A0A] w-1/4"></div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══ FULL-SCREEN MOBILE MENU ═══ */}
+      <AnimatePresence>
+        {mobileMenu && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[60] bg-[#FAFAFA] lg:hidden flex flex-col"
+          >
+            {/* Top bar */}
+            <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A]">
+              <a
+                href="#hero"
+                onClick={() => setMobileMenu(false)}
+                className="text-lg font-bold tracking-tight flex items-center gap-2 uppercase"
+              >
+                <TrendMindLogo />
+                TrendMind
+              </a>
+              <button
+                className="p-2 rounded-xl border-[2px] border-[#0A0A0A] bg-white"
+                onClick={() => setMobileMenu(false)}
+              >
+                <XIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Nav links centered */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8">
+              {["About", "Features", "Pricing", "FAQ"].map((item, i) => (
+                <motion.a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  onClick={() => setMobileMenu(false)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + i * 0.08 }}
+                  className="w-full max-w-xs text-center px-6 py-4 rounded-2xl border-[3px] border-[#0A0A0A] font-bold text-lg uppercase tracking-wider hover:bg-[#FBBF24] transition-colors shadow-[4px_4px_0px_0px_#0A0A0A] bg-white"
+                >
+                  {item}
+                </motion.a>
+              ))}
+              <motion.a
+                href="#pricing"
+                onClick={() => setMobileMenu(false)}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="w-full max-w-xs text-center px-6 py-4 rounded-2xl border-[3px] border-[#0A0A0A] bg-[#2563EB] text-white font-bold text-lg uppercase tracking-wider shadow-[4px_4px_0px_0px_#0A0A0A]"
+              >
+                Get Access
+              </motion.a>
+            </div>
+
+            {/* Bottom decoration */}
+            <div className="px-8 pb-8">
+              <div className="flex h-[4px] rounded-full overflow-hidden">
+                <div className="flex-1 bg-[#2563EB]" />
+                <div className="flex-1 bg-[#FBBF24]" />
+                <div className="flex-1 bg-[#E64833]" />
+                <div className="flex-1 bg-[#0A0A0A]" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main className="relative z-10">
         {/* ═══════════════ 1. HERO ═══════════════ */}
@@ -504,6 +511,62 @@ export default function TrendMind() {
           className="relative min-h-[100svh] flex flex-col items-center justify-center text-center px-5 pt-28 pb-16 overflow-hidden"
         >
           <FloatingShapes variant="hero" />
+
+          {/* ── Glow Orbs ── */}
+          <div className="absolute top-1/4 left-[10%] w-[420px] h-[420px] bg-[#2563EB]/[0.07] rounded-full blur-[100px] animate-glow-drift pointer-events-none" />
+          <div className="absolute bottom-1/4 right-[8%] w-[360px] h-[360px] bg-[#FBBF24]/[0.08] rounded-full blur-[90px] animate-glow-drift-2 pointer-events-none" />
+          <div className="absolute top-[60%] left-[45%] w-[280px] h-[280px] bg-[#E64833]/[0.05] rounded-full blur-[80px] animate-glow-drift pointer-events-none" />
+
+          {/* ── Orbit Rings ── */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] pointer-events-none">
+            <div className="absolute inset-0 border-[1.5px] border-dashed border-[#2563EB]/[0.08] rounded-full animate-orbit" />
+            <div className="absolute inset-8 border-[1.5px] border-dashed border-[#FBBF24]/[0.1] rounded-full animate-orbit-reverse" />
+            <div
+              className="absolute inset-20 border-[1px] border-[#0A0A0A]/[0.04] rounded-full animate-orbit"
+              style={{ animationDuration: "35s" }}
+            />
+            {/* Orbiting dots */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#2563EB] rounded-full opacity-30 shadow-[0_0_12px_#2563EB]" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-[#FBBF24] rounded-full opacity-40 shadow-[0_0_10px_#FBBF24]" />
+            <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#E64833] rounded-full opacity-30 shadow-[0_0_8px_#E64833]" />
+          </div>
+
+          {/* ── Grain Overlay ── */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.03] animate-grain"
+            style={{
+              backgroundImage:
+                'url("data:image/svg+xml,%3Csvg viewBox=%270 0 256 256%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E")',
+              backgroundRepeat: "repeat",
+              backgroundSize: "128px 128px",
+            }}
+          />
+
+          {/* ── Scattered micro-dots ── */}
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={`dot-${i}`}
+              className="absolute w-1.5 h-1.5 rounded-full bg-[#2563EB] opacity-20 animate-float"
+              style={{
+                top: `${15 + i * 14}%`,
+                left: `${5 + i * 16}%`,
+                animationDelay: `${i * 0.8}s`,
+                animationDuration: `${5 + i}s`,
+              }}
+            />
+          ))}
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={`dot2-${i}`}
+              className="absolute w-1 h-1 rounded-full bg-[#FBBF24] opacity-25 animate-float-reverse"
+              style={{
+                top: `${20 + i * 15}%`,
+                right: `${4 + i * 12}%`,
+                animationDelay: `${i * 1.1}s`,
+                animationDuration: `${6 + i}s`,
+              }}
+            />
+          ))}
 
           {/* Badges */}
           <motion.div
@@ -651,11 +714,7 @@ export default function TrendMind() {
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2.5">
-                    <img
-                      src={post.img}
-                      alt={post.name}
-                      className="w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] object-cover"
-                    />
+                    <Avatar name={post.name} bg={post.avatarBg} />
                     <div>
                       <div className="font-bold uppercase text-xs">
                         {post.name}
@@ -760,104 +819,439 @@ export default function TrendMind() {
         {/* ═══════════════ 3. FEATURES ═══════════════ */}
         <section
           id="features"
-          className="py-24 lg:py-32 px-5 bg-[#FAFAFA] relative overflow-hidden"
+          className="py-24 lg:py-36 px-5 bg-[#FAFAFA] relative overflow-hidden"
         >
-          <FloatingShapes variant="section" />
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
-            <div>
-              <Reveal>
+          {/* Section bg elements */}
+          <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[#2563EB]/[0.04] rounded-full blur-[80px]" />
+            <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#FBBF24]/[0.05] rounded-full blur-[70px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border-[1px] border-dashed border-[#0A0A0A]/[0.04] rounded-full animate-orbit" />
+          </div>
+
+          <div className="max-w-6xl mx-auto relative z-10">
+            {/* Section header */}
+            <Reveal>
+              <div className="text-center mb-16 lg:mb-20">
                 <span className="inline-block bg-[#2563EB] text-white border-[2px] border-[#0A0A0A] px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] mb-5">
                   Features
                 </span>
-                <h2 className="text-3xl md:text-[2.75rem] leading-[1.1] font-bold uppercase tracking-tight mb-4">
-                  LinkedIn AI Tools for{" "}
-                  <span className="text-[#2563EB] relative">
-                    Content Success.
+                <h2 className="text-3xl md:text-5xl lg:text-[3.5rem] font-bold uppercase tracking-tight mb-4 leading-[1.1]">
+                  Everything You Need to
+                  <br />
+                  <span className="text-[#2563EB] relative inline-block">
+                    Dominate LinkedIn
                     <motion.span
                       initial={{ scaleX: 0 }}
                       whileInView={{ scaleX: 1 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.5, duration: 0.5 }}
-                      className="absolute -bottom-1 left-0 w-full h-[3px] bg-[#FBBF24] origin-left rounded-full"
+                      className="absolute -bottom-1 left-0 w-full h-[4px] bg-[#FBBF24] origin-left rounded-full"
                     />
                   </span>
                 </h2>
-                <p className="text-sm text-[#0A0A0A]/70 font-medium mb-8 max-w-md border-l-[3px] border-[#FBBF24] pl-4 py-1 leading-relaxed">
-                  Comprehensive automation tools to create viral content,
-                  schedule posts, and analyze performance faster.
+                <p className="text-base md:text-lg font-medium text-[#0A0A0A]/60 max-w-xl mx-auto">
+                  AI-powered tools that transform your content strategy from
+                  guesswork into a science.
                 </p>
+              </div>
+            </Reveal>
+
+            {/* ── Bento Grid ── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+              {/* Card 1 — Content Analytics (spans 2 cols on lg) */}
+              <Reveal delay={0} className="lg:col-span-2">
+                <motion.div
+                  whileHover={{
+                    y: -8,
+                    transition: { type: "spring", stiffness: 400, damping: 20 },
+                  }}
+                  className="bg-[#FBBF24] p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#2563EB] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                >
+                  {/* Shimmer overlay */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 bg-white rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
+                        <LineChart className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg uppercase tracking-tight">
+                          Content Analytics
+                        </h3>
+                        <p className="text-xs font-medium opacity-70">
+                          Deep insights into what resonates
+                        </p>
+                      </div>
+                    </div>
+                    {/* Mini chart visualization */}
+                    <div className="flex items-end gap-2 md:gap-3 h-28 w-full mt-4">
+                      {[35, 55, 40, 72, 48, 90, 65, 100, 78, 88].map((h, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ height: 0 }}
+                          whileInView={{ height: `${h}%` }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.6,
+                            delay: 0.1 + i * 0.06,
+                            ease: [0.25, 0.1, 0.25, 1],
+                          }}
+                          className={`flex-1 rounded-t-lg border-[2px] border-[#0A0A0A] transition-colors duration-300 ${
+                            i >= 7 ? "bg-[#2563EB]" : "bg-white"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-2xl md:text-3xl font-bold tracking-tight">
+                        +340%
+                      </span>
+                      <span className="bg-white px-3 py-1.5 rounded-full border-[2px] border-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#0A0A0A]">
+                        ↑ Engagement
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
               </Reveal>
 
-              <div className="space-y-3">
-                {features.map((item, i) => (
-                  <Reveal key={i} delay={i * 0.08}>
-                    <div
-                      onClick={() => setActiveFeature(i)}
-                      className={`p-4 rounded-xl border-[2px] border-[#0A0A0A] transition-all cursor-pointer flex items-center justify-between group ${
-                        activeFeature === i
-                          ? "bg-[#0A0A0A] text-white shadow-[4px_4px_0px_0px_#FBBF24] translate-x-1"
-                          : "bg-white hover:bg-gray-50 shadow-[3px_3px_0px_0px_#0A0A0A] hover:-translate-y-0.5"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`p-2 rounded-lg border-[2px] border-[#0A0A0A] ${
-                            activeFeature === i ? item.bg : "bg-[#FAFAFA]"
-                          } ${item.text || "text-[#0A0A0A]"}`}
-                        >
-                          {item.icon}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-sm uppercase tracking-wide">
-                            {item.title}
-                          </h4>
-                          <p
-                            className={`font-medium text-xs ${
-                              activeFeature === i ? "opacity-70" : "opacity-50"
-                            }`}
-                          >
-                            {item.desc}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronRight
-                        className={`w-4 h-4 transition-all ${
-                          activeFeature === i
-                            ? "opacity-100 text-[#FBBF24] translate-x-0"
-                            : "opacity-0 -translate-x-2"
-                        }`}
-                      />
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-
-            {/* Interactive Window */}
-            <Reveal delay={0.2}>
-              <div className="relative flex justify-center h-[420px] lg:h-[480px]">
-                <div className="w-full h-full bg-[#2563EB] rounded-[2rem] border-[3px] border-[#0A0A0A] shadow-[8px_8px_0px_0px_#0A0A0A] p-5 relative overflow-hidden flex flex-col items-center justify-center">
+              {/* Card 2 — AI Generation */}
+              <Reveal delay={0.1}>
+                <motion.div
+                  whileHover={{
+                    y: -8,
+                    transition: { type: "spring", stiffness: 400, damping: 20 },
+                  }}
+                  className="bg-[#2563EB] text-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                >
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:animate-shimmer" />
+                  </div>
+                  {/* Dot pattern */}
                   <div
-                    className="absolute inset-0 opacity-15"
+                    className="absolute inset-0 opacity-10 pointer-events-none"
                     style={{
                       backgroundImage:
-                        "radial-gradient(circle at 3px 3px, #FAFAFA 1.5px, transparent 0)",
-                      backgroundSize: "20px 20px",
+                        "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+                      backgroundSize: "16px 16px",
                     }}
                   />
-                  <AnimatePresence mode="wait">
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 bg-[#FBBF24] rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A] text-[#0A0A0A]">
+                        <Zap className="w-5 h-5" />
+                      </div>
+                      <h3 className="font-bold text-lg uppercase tracking-tight">
+                        AI Generation
+                      </h3>
+                    </div>
+                    <p className="text-sm font-medium opacity-80 mb-6 leading-relaxed">
+                      Data-driven posts, hooks, and formats generated instantly
+                      by AI.
+                    </p>
+                    {/* Fake generated content */}
+                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border-[2px] border-white/20">
+                      <div className="space-y-2.5 mb-4">
+                        <div className="h-2.5 w-4/5 bg-white/30 rounded-full" />
+                        <div className="h-2.5 w-full bg-white/25 rounded-full" />
+                        <div className="h-2.5 w-3/5 bg-white/20 rounded-full" />
+                      </div>
+                      <motion.div
+                        animate={{ opacity: [1, 0.4, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="inline-flex items-center gap-1.5 bg-[#FBBF24] text-[#0A0A0A] px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                      >
+                        <Sparkles className="w-3 h-3" /> Generating...
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
+              </Reveal>
+
+              {/* Card 3 — Smart Scheduling */}
+              <Reveal delay={0.15}>
+                <motion.div
+                  whileHover={{
+                    y: -8,
+                    transition: { type: "spring", stiffness: 400, damping: 20 },
+                  }}
+                  className="bg-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                >
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#FBBF24]/20 to-transparent group-hover:animate-shimmer" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 bg-[#FAFAFA] rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
+                        <Calendar className="w-5 h-5" />
+                      </div>
+                      <h3 className="font-bold text-lg uppercase tracking-tight">
+                        Smart Scheduling
+                      </h3>
+                    </div>
+                    <p className="text-sm font-medium opacity-60 mb-5 leading-relaxed">
+                      Post at mathematically optimal times for max reach.
+                    </p>
+                    {/* Calendar mini grid */}
+                    <div className="grid grid-cols-4 gap-2">
+                      {[...Array(8)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          animate={
+                            i === 2 || i === 5 ? { scale: [1, 1.08, 1] } : {}
+                          }
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            delay: i === 5 ? 0.5 : 0,
+                          }}
+                          className={`aspect-square rounded-lg border-[2px] border-[#0A0A0A] flex items-center justify-center font-bold text-xs ${
+                            i === 2
+                              ? "bg-[#FBBF24] shadow-[2px_2px_0px_0px_#0A0A0A]"
+                              : i === 5
+                                ? "bg-[#2563EB] text-white shadow-[2px_2px_0px_0px_#0A0A0A]"
+                                : "bg-[#FAFAFA]"
+                          }`}
+                        >
+                          {i + 14}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </Reveal>
+
+              {/* Card 4 — Trend Tracking */}
+              <Reveal delay={0.2}>
+                <motion.div
+                  whileHover={{
+                    y: -8,
+                    transition: { type: "spring", stiffness: 400, damping: 20 },
+                  }}
+                  className="bg-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#E64833] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                >
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#E64833]/10 to-transparent group-hover:animate-shimmer" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 bg-[#FAFAFA] rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
+                        <Activity className="w-5 h-5" />
+                      </div>
+                      <h3 className="font-bold text-lg uppercase tracking-tight">
+                        Trend Tracking
+                      </h3>
+                    </div>
+                    <p className="text-sm font-medium opacity-60 mb-5 leading-relaxed">
+                      Capitalize on viral formats before they peak.
+                    </p>
+                    {/* Trend line */}
                     <motion.div
-                      key={activeFeature}
-                      initial={{ opacity: 0, scale: 0.92, y: 15 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.92, y: -15 }}
-                      transition={{ duration: 0.3 }}
-                      className="w-full h-full bg-white rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] relative z-10 overflow-hidden"
+                      animate={{ y: [-4, 4, -4] }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      className="bg-[#FAFAFA] p-4 rounded-xl border-[2px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#FBBF24]"
                     >
-                      {features[activeFeature].visual}
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">
+                          Viral Format #4
+                        </span>
+                        <span className="bg-[#E64833] text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                          Trending
+                        </span>
+                      </div>
+                      <div className="w-full h-12 relative">
+                        <svg
+                          className="w-full h-full overflow-visible"
+                          preserveAspectRatio="none"
+                          viewBox="0 0 200 50"
+                        >
+                          <motion.path
+                            initial={{ pathLength: 0 }}
+                            whileInView={{ pathLength: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 2, ease: "easeInOut" }}
+                            d="M0,40 Q30,35 50,30 T100,18 T150,8 T200,2"
+                            fill="none"
+                            stroke="#2563EB"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                          />
+                          <motion.path
+                            initial={{ pathLength: 0 }}
+                            whileInView={{ pathLength: 1 }}
+                            viewport={{ once: true }}
+                            transition={{
+                              duration: 2,
+                              ease: "easeInOut",
+                              delay: 0.3,
+                            }}
+                            d="M0,45 Q30,42 50,38 T100,30 T150,25 T200,20"
+                            fill="none"
+                            stroke="#FBBF24"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            opacity="0.5"
+                          />
+                        </svg>
+                      </div>
                     </motion.div>
-                  </AnimatePresence>
-                </div>
+                  </div>
+                </motion.div>
+              </Reveal>
+
+              {/* Card 5 — Performance Score (spans 2 cols on lg) */}
+              <Reveal delay={0.25}>
+                <motion.div
+                  whileHover={{
+                    y: -8,
+                    transition: { type: "spring", stiffness: 400, damping: 20 },
+                  }}
+                  className="bg-gradient-to-br from-[#2563EB] to-[#0A0A0A] text-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#FBBF24] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                >
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:animate-shimmer" />
+                  </div>
+                  {/* Animated gradient orb */}
+                  <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#FBBF24] rounded-full opacity-10 blur-3xl group-hover:opacity-20 transition-opacity" />
+
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-[#FBBF24] rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
+                        <BarChart3 className="w-5 h-5 text-[#0A0A0A]" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg uppercase tracking-tight">
+                          Performance Score
+                        </h3>
+                        <p className="text-xs font-medium opacity-60">
+                          Pre-publish validation
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm font-medium text-white/70 mb-8 leading-relaxed max-w-md">
+                      Every post gets scored before publishing. Know exactly how
+                      it will perform with our proprietary engagement prediction
+                      engine.
+                    </p>
+
+                    {/* Score visualization */}
+                    <div className="flex items-end gap-6">
+                      <div className="flex-1">
+                        <div className="flex items-end gap-2 h-24">
+                          {[45, 65, 78, 88, 92].map((val, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ height: 0 }}
+                              whileInView={{ height: `${val}%` }}
+                              viewport={{ once: true }}
+                              transition={{
+                                duration: 0.6,
+                                delay: 0.1 + i * 0.08,
+                                ease: [0.25, 0.1, 0.25, 1],
+                              }}
+                              className="flex-1 bg-[#FBBF24] rounded-t-lg border-[2px] border-[#0A0A0A]"
+                            />
+                          ))}
+                        </div>
+                        <div className="text-[10px] font-bold uppercase tracking-widest opacity-50 mt-2">
+                          Trending
+                        </div>
+                      </div>
+
+                      {/* Score badge */}
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        whileInView={{ scale: 1, rotate: 0 }}
+                        viewport={{ once: true }}
+                        transition={{
+                          delay: 0.5,
+                          type: "spring",
+                          stiffness: 100,
+                        }}
+                        className="flex flex-col items-center"
+                      >
+                        <div className="relative w-24 h-24">
+                          <svg
+                            className="w-full h-full -rotate-90"
+                            viewBox="0 0 100 100"
+                          >
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="42"
+                              stroke="white"
+                              strokeWidth="3"
+                              fill="none"
+                              opacity="0.15"
+                            />
+                            <motion.circle
+                              cx="50"
+                              cy="50"
+                              r="42"
+                              stroke="#FBBF24"
+                              strokeWidth="3"
+                              fill="none"
+                              strokeLinecap="round"
+                              initial={{ pathLength: 0 }}
+                              whileInView={{ pathLength: 0.94 }}
+                              viewport={{ once: true }}
+                              transition={{
+                                duration: 1.5,
+                                delay: 0.5,
+                                ease: "easeOut",
+                              }}
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <motion.span
+                              initial={{ opacity: 0, scale: 0.5 }}
+                              whileInView={{ opacity: 1, scale: 1 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 1, type: "spring" }}
+                              className="text-2xl font-bold text-[#FBBF24] tracking-tight"
+                            >
+                              94
+                            </motion.span>
+                            <span className="text-[8px] font-bold uppercase tracking-widest opacity-50">
+                              Score
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
+              </Reveal>
+            </div>
+
+            {/* Bottom feature pills */}
+            <Reveal delay={0.3}>
+              <div className="flex flex-wrap justify-center gap-3 mt-12">
+                {[
+                  "Multi-format Support",
+                  "A/B Testing",
+                  "Hashtag AI",
+                  "Hook Library",
+                  "Team Collaboration",
+                  "API Access",
+                ].map((pill, i) => (
+                  <motion.span
+                    key={pill}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * i }}
+                    className="px-4 py-2 rounded-full border-[2px] border-[#0A0A0A] bg-white text-[10px] font-bold uppercase tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 hover:bg-[#FBBF24] transition-all cursor-default"
+                  >
+                    {pill}
+                  </motion.span>
+                ))}
               </div>
             </Reveal>
           </div>
@@ -890,7 +1284,7 @@ export default function TrendMind() {
                   stat: "20x",
                   label: "Growth",
                   text: "I now have a clear strategy for my LinkedIn content. The Data insights has helped me gain consistency.",
-                  img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=150&h=150&fit=crop",
+                  avatarBg: "bg-[#FBBF24]",
                   accent: "bg-[#FBBF24]",
                   shadow: "#FBBF24",
                   mt: "mt-0",
@@ -901,7 +1295,7 @@ export default function TrendMind() {
                   stat: "+100%",
                   label: "Impressions",
                   text: "The AI recommendations are spot-on! They changed the way we curate linkedin specific content entirely.",
-                  img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
+                  avatarBg: "bg-[#2563EB]",
                   accent: "bg-[#2563EB]",
                   shadow: "#2563EB",
                   mt: "md:mt-10",
@@ -912,7 +1306,7 @@ export default function TrendMind() {
                   stat: "5hrs",
                   label: "Saved/Week",
                   text: "The time I save on content creation is incredible. Now I can actually focus on higher-level strategy.",
-                  img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop",
+                  avatarBg: "bg-[#0A0A0A]",
                   accent: "bg-[#0A0A0A]",
                   shadow: "#0A0A0A",
                   mt: "md:mt-20",
@@ -953,11 +1347,7 @@ export default function TrendMind() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <img
-                          src={review.img}
-                          alt={review.name}
-                          className="w-10 h-10 rounded-full border-[2px] border-[#0A0A0A] object-cover"
-                        />
+                        <Avatar name={review.name} bg={review.avatarBg} />
                         <div>
                           <div className="font-bold uppercase text-xs">
                             {review.name}
@@ -1301,21 +1691,22 @@ export default function TrendMind() {
 
         <div className="max-w-6xl mx-auto px-5 pt-14 pb-8 relative z-10">
           {/* Top stripe - Bauhaus color bar */}
-          <div className="flex h-[4px] mb-12 rounded-full overflow-hidden">
+          <div className="flex h-[4px] mb-10 rounded-full overflow-hidden">
             <div className="flex-1 bg-[#2563EB]" />
             <div className="flex-1 bg-[#FBBF24]" />
             <div className="flex-1 bg-[#E64833]" />
             <div className="flex-1 bg-white" />
           </div>
 
-          <div className="grid md:grid-cols-12 gap-10 mb-12">
-            {/* Brand */}
-            <div className="md:col-span-5">
-              <div className="text-xl font-bold tracking-tight flex items-center gap-2 mb-5 uppercase">
+          {/* Footer grid — mobile: brand top, then Product+Legal side by side, then Powered By */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 mb-12">
+            {/* Brand — full width on mobile, 5 cols on md */}
+            <div className="col-span-2 md:col-span-5">
+              <div className="text-xl font-bold tracking-tight flex items-center gap-2 mb-4 uppercase">
                 <TrendMindLogo />
                 TrendMind
               </div>
-              <p className="text-white/50 font-medium text-sm max-w-sm leading-relaxed mb-6">
+              <p className="text-white/50 font-medium text-sm max-w-sm leading-relaxed mb-5">
                 Craft high-performing posts with AI-powered strategy and
                 dominate your industry on LinkedIn.
               </p>
@@ -1328,11 +1719,11 @@ export default function TrendMind() {
                   },
                   {
                     icon: <Twitter className="w-4 h-4" />,
-                    bg: "hover:bg-[#0A0A0A]",
+                    bg: "hover:bg-[#1DA1F2]",
                   },
                   {
                     icon: <Github className="w-4 h-4" />,
-                    bg: "hover:bg-[#0A0A0A]",
+                    bg: "hover:bg-white/20",
                   },
                   {
                     icon: <Mail className="w-4 h-4" />,
@@ -1350,49 +1741,55 @@ export default function TrendMind() {
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="md:col-span-2">
-              <h4 className="font-bold uppercase mb-5 text-xs tracking-wider text-[#FBBF24]">
+            {/* Product — 1 col on mobile, 2 cols on md */}
+            <div className="col-span-1 md:col-span-2">
+              <h4 className="font-bold uppercase mb-4 text-xs tracking-wider text-[#FBBF24]">
                 Product
               </h4>
-              <ul className="space-y-3 font-medium text-xs uppercase tracking-wider text-white/60">
-                {["About", "Features", "Pricing", "Changelog"].map((link) => (
+              <ul className="space-y-3 font-medium text-start text-xs uppercase tracking-wider text-white/60">
+                {["About", "Features", "Pricing", "FAQ"].map((link) => (
                   <li key={link}>
+                    {/* Fixed Alignment: Relative positioning to handle the chevron without pushing text */}
                     <a
                       href={`#${link.toLowerCase()}`}
-                      className="hover:text-white transition-colors flex items-center gap-1 group"
+                      className="hover:text-white transition-colors flex items-center relative group"
                     >
-                      <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {link}
+                      <ChevronRight className="w-3 h-3 absolute -left-4 opacity-0 group-hover:opacity-100 group-hover:-translate-x-1 transition-all" />
+                      <span className="transition-transform group-hover:translate-x-1">
+                        {link}
+                      </span>
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Legal */}
-            <div className="md:col-span-2">
-              <h4 className="font-bold uppercase mb-5 text-xs tracking-wider text-[#FBBF24]">
+            {/* Legal — 1 col on mobile, 2 cols on md */}
+            <div className="col-span-1 md:col-span-2">
+              <h4 className="font-bold uppercase mb-4 text-xs tracking-wider text-[#FBBF24]">
                 Legal
               </h4>
               <ul className="space-y-3 font-medium text-xs uppercase tracking-wider text-white/60">
                 {["Terms", "Privacy", "Security", "Contact"].map((link) => (
                   <li key={link}>
+                    {/* Fixed Alignment: Relative positioning to handle the chevron without pushing text */}
                     <a
                       href="#"
-                      className="hover:text-white transition-colors flex items-center gap-1 group"
+                      className="hover:text-white transition-colors flex items-center relative group"
                     >
-                      <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {link}
+                      <ChevronRight className="w-3 h-3 absolute -left-4 opacity-0 group-hover:opacity-100 group-hover:-translate-x-1 transition-all" />
+                      <span className="transition-transform group-hover:translate-x-1">
+                        {link}
+                      </span>
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Powered by */}
-            <div className="md:col-span-3">
-              <h4 className="font-bold uppercase mb-5 text-xs tracking-wider text-[#FBBF24]">
+            {/* Powered by — full width on mobile, 3 cols on md */}
+            <div className="col-span-2 md:col-span-3">
+              <h4 className="font-bold uppercase mb-4 text-xs tracking-wider text-[#FBBF24]">
                 Powered By
               </h4>
               <div className="flex flex-wrap gap-2">
