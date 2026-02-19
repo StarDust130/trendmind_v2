@@ -37,6 +37,7 @@ import {
   Moon,
 } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 /* ─────────────────────── LOGO ─────────────────────── */
 const TrendMindLogo = ({ size = 28 }: { size?: number }) => (
@@ -360,6 +361,11 @@ export default function TrendMind() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [showDemo, setShowDemo] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const { isSignedIn } = useAuth();
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setShowBackToTop(latest > 500);
@@ -388,18 +394,26 @@ export default function TrendMind() {
         {!mobileMenu && (
           <div className="px-5 lg:px-10 py-3.5 flex justify-between items-center relative z-50 bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-xl border-b-[3px] border-[#0A0A0A] dark:border-white/15">
             <div className="flex items-center gap-8">
-              <a
+              <Link
                 href="#hero"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("hero");
+                }}
                 className="text-lg font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A] dark:text-white"
               >
                 <TrendMindLogo />
                 TrendMind
-              </a>
+              </Link>
               <div className="hidden lg:flex gap-2 text-xs font-bold uppercase tracking-wider">
                 {["About", "Features", "Pricing", "FAQ"].map((item) => (
                   <a
                     key={item}
                     href={`#${item.toLowerCase()}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(item.toLowerCase());
+                    }}
                     className="px-4 py-2 rounded-full border-[3px] border-transparent hover:border-[#0A0A0A] dark:hover:border-white/30 hover:shadow-[3px_3px_0px_0px_#0A0A0A] dark:hover:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] hover:bg-white dark:hover:bg-white/10 transition-all duration-200 text-[#0A0A0A] dark:text-white/80"
                   >
                     {item}
@@ -409,17 +423,30 @@ export default function TrendMind() {
             </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              <button className="font-bold text-xs uppercase hidden md:block hover:text-[#2563EB] dark:hover:text-[#3b82f6] transition-colors tracking-wider">
-                Sign In
-              </button>
-
-              {/* Desktop Get Access Button with Arrow Icon */}
-              <Link
-                href="/dashboard"
-                className="hidden md:inline-flex items-center gap-2 bg-[#2563EB] text-white rounded-full px-6 py-2.5 text-xs font-black uppercase border-[3px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all"
-              >
-                Get Access <ArrowUpRight className="w-4 h-4" strokeWidth={3} />
-              </Link>
+              {isSignedIn ? (
+                <Link
+                  href="/dashboard"
+                  className="hidden md:inline-flex items-center gap-2 bg-[#2563EB] text-white rounded-full px-6 py-2.5 text-xs font-black uppercase border-[3px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all"
+                >
+                  Dashboard <ArrowUpRight className="w-4 h-4" strokeWidth={3} />
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/sign-in"
+                    className="font-bold text-xs uppercase hidden md:block hover:text-[#2563EB] dark:hover:text-[#3b82f6] transition-colors tracking-wider"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="hidden md:inline-flex items-center gap-2 bg-[#2563EB] text-white rounded-full px-6 py-2.5 text-xs font-black uppercase border-[3px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all"
+                  >
+                    Get Access{" "}
+                    <ArrowUpRight className="w-4 h-4" strokeWidth={3} />
+                  </Link>
+                </>
+              )}
 
               {/* Mobile Menu Open Toggle */}
               <button
@@ -482,14 +509,17 @@ export default function TrendMind() {
 
             {/* Header */}
             <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A] dark:border-white/15 bg-white dark:bg-[#111111] relative z-10">
-              <a
+              <Link
                 href="#hero"
-                onClick={() => setMobileMenu(false)}
-                className="text-xl font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A] dark:text-white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("hero");
+                }}
+                className="text-lg font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A] dark:text-white"
               >
                 <TrendMindLogo />
                 TrendMind
-              </a>
+              </Link>
               <button
                 className="p-1.5 rounded-[0.8rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
                 onClick={() => setMobileMenu(false)}
@@ -507,7 +537,11 @@ export default function TrendMind() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   href={`#${item.toLowerCase()}`}
-                  onClick={() => setMobileMenu(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMobileMenu(false);
+                    scrollToSection(item.toLowerCase());
+                  }}
                   className="w-full text-center py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
                 >
                   {item}
@@ -519,11 +553,12 @@ export default function TrendMind() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                href="/dashboard"
+                href={isSignedIn ? "/dashboard" : "/sign-up"}
                 onClick={() => setMobileMenu(false)}
                 className="w-full flex items-center justify-center gap-2 py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-[#2563EB] text-white font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all mt-2"
               >
-                Get Access <ArrowUpRight className="w-5 h-5" strokeWidth={3} />
+                {isSignedIn ? "Dashboard" : "Get Access"}{" "}
+                <ArrowUpRight className="w-5 h-5" strokeWidth={3} />
               </motion.a>
             </div>
 
@@ -552,8 +587,11 @@ export default function TrendMind() {
             <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A] dark:border-white/15">
               <Link
                 href="#hero"
-                onClick={() => setMobileMenu(false)}
-                className="text-lg font-bold tracking-tight flex items-center gap-2 uppercase"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("hero");
+                }}
+                className="text-lg font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A] dark:text-white"
               >
                 <TrendMindLogo />
                 TrendMind
@@ -572,7 +610,11 @@ export default function TrendMind() {
                 <motion.a
                   key={item}
                   href={`#${item.toLowerCase()}`}
-                  onClick={() => setMobileMenu(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMobileMenu(false);
+                    scrollToSection(item.toLowerCase());
+                  }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.08 }}
@@ -582,14 +624,14 @@ export default function TrendMind() {
                 </motion.a>
               ))}
               <motion.a
-                href="/dashboard"
+                href={isSignedIn ? "/dashboard" : "/sign-up"}
                 onClick={() => setMobileMenu(false)}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
                 className="w-full max-w-xs text-center px-6 py-4 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/20 bg-[#2563EB] text-white font-bold text-lg uppercase tracking-wider shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)]"
               >
-                Get Access
+                {isSignedIn ? "Dashboard" : "Get Access"}
               </motion.a>
             </div>
 
@@ -731,10 +773,11 @@ export default function TrendMind() {
             className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto z-10 relative"
           >
             <Link
-              href="/dashboard"
+              href={isSignedIn ? "/dashboard" : "/sign-up"}
               className="bg-[#2563EB] text-white rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all flex items-center justify-center gap-2 tracking-wide"
             >
-              Get Early Access <ArrowUpRight className="w-4 h-4" />
+              {isSignedIn ? "Go to Dashboard" : "Get Early Access"}{" "}
+              <ArrowUpRight className="w-4 h-4" />
             </Link>
             <button
               onClick={() => setShowDemo(true)}
@@ -798,7 +841,7 @@ export default function TrendMind() {
             {marqueePosts.map((post, i) => (
               <div
                 key={i}
-                className="w-[340px] bg-white dark:bg-[#141414] border-[2px] border-[#0A0A0A] dark:border-white/15 rounded-2xl p-5 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.08)] flex flex-col shrink-0 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_0px_#2563EB] dark:hover:shadow-[6px_6px_0px_0px_#3b82f6] transition-all cursor-pointer group"
+                className="w-[340px] md:mt-2 bg-white dark:bg-[#141414] border-[2px] border-[#0A0A0A] dark:border-white/15 rounded-2xl p-5 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.08)] flex flex-col shrink-0 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_0px_#2563EB] dark:hover:shadow-[6px_6px_0px_0px_#3b82f6] transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2.5">
@@ -1796,10 +1839,17 @@ export default function TrendMind() {
           <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 mb-12">
             {/* Brand — full width on mobile, 5 cols on md */}
             <div className="col-span-2 md:col-span-5">
-              <div className="text-xl font-bold tracking-tight flex items-center gap-2 mb-4 uppercase">
+              <Link
+                href="#hero"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("hero");
+                }}
+                className="text-lg font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A] dark:text-white"
+              >
                 <TrendMindLogo />
                 TrendMind
-              </div>
+              </Link>
               <p className="text-white/50 font-medium text-sm max-w-sm leading-relaxed mb-5">
                 Craft high-performing posts with AI-powered strategy and
                 dominate your industry on LinkedIn.
@@ -1846,6 +1896,10 @@ export default function TrendMind() {
                     {/* Fixed Alignment: Relative positioning to handle the chevron without pushing text */}
                     <a
                       href={`#${link.toLowerCase()}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        scrollToSection(link.toLowerCase());
+                      }}
                       className="hover:text-white transition-colors flex items-center relative group"
                     >
                       <ChevronRight className="w-3 h-3 absolute -left-4 opacity-0 group-hover:opacity-100 group-hover:-translate-x-1 transition-all" />
