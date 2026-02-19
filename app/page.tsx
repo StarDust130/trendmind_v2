@@ -285,7 +285,7 @@ const ThemeToggle = () => {
             transition={{ duration: 0.15, ease: "easeOut" }}
             className="hidden md:block absolute top-full mt-2.5 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-[#0A0A0A] dark:bg-white text-white dark:text-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider whitespace-nowrap pointer-events-none z-999 border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[2px_2px_0px_0px_#2563EB]"
           >
-            {isDark ? "Light Mode" : "Dark Mode"}
+            {isDark ? "Light Mode (Be prepared) 🫣" : "Dark Mode"}
             <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0A0A0A] dark:bg-white rotate-45 border-l-[2px] border-t-[2px] border-[#0A0A0A] dark:border-white/20" />
           </motion.div>
         )}
@@ -1927,45 +1927,45 @@ export default function TrendMind() {
         )}
       </AnimatePresence>
 
-      {/* ═══════════════ DEMO MODAL ═══════════════ */}
+      {/* ═══════════════ FULL CONTROL DEMO MODAL ═══════════════ */}
       <AnimatePresence>
         {showDemo && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center p-5"
+            className="fixed inset-0 z-[100] bg-[#0A0A0A]/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
             onClick={() => setShowDemo(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 30 }}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 30 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="relative w-full max-w-4xl"
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="relative w-full max-w-5xl bg-[#0A0A0A] rounded-2xl sm:rounded-[2rem] border-[3px] border-white/20 shadow-[0_0_80px_rgba(37,99,235,0.2)] flex flex-col justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close button */}
+              {/* --- NEO-BRUTALIST CLOSE BUTTON --- */}
+              {/* Positioned slightly offset on mobile so it doesn't block the video, and cleanly inside on desktop */}
               <button
                 onClick={() => setShowDemo(false)}
-                className="absolute -top-14 right-0 w-10 h-10 bg-white dark:bg-[#1A1A1A] text-[#0A0A0A] dark:text-white rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center hover:bg-[#FBBF24] transition-colors shadow-[3px_3px_0px_0px_#2563EB] cursor-pointer"
+                className="absolute -top-4 -right-4 sm:top-6 sm:right-6 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-white text-[#0A0A0A] rounded-full border-[3px] border-[#0A0A0A] flex items-center justify-center hover:bg-[#E64833] hover:text-white transition-all shadow-[4px_4px_0px_0px_#2563EB] active:shadow-none active:translate-y-1 active:translate-x-1"
+                title="Close"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={3} />
               </button>
 
-              <div className="aspect-video bg-[#0A0A0A] rounded-2xl border-[3px] border-white/20 overflow-hidden shadow-[0_0_60px_rgba(37,99,235,0.3)]">
+              {/* --- FULLY INTERACTIVE VIDEO CONTAINER --- */}
+              {/* Removed pointer-events-none and scale. Added exact YouTube URL parameters for standard controls. */}
+              <div className="relative aspect-video w-full bg-[#0A0A0A] rounded-2xl sm:rounded-[2rem] overflow-hidden">
                 <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0"
+                  src="https://www.youtube.com/embed/EH9yR6T4ePI?start=63&autoplay=1&mute=0&rel=0&modestbranding=1"
                   title="TrendMind Demo"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen
-                  className="w-full h-full"
+                  className="w-full h-full border-none"
                 />
               </div>
-
-              <p className="text-center text-white/50 text-xs font-medium uppercase tracking-wider mt-4">
-                Press ESC or click outside to close
-              </p>
             </motion.div>
           </motion.div>
         )}
