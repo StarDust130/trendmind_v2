@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import {
   motion,
   useScroll,
@@ -32,6 +33,8 @@ import {
   ChevronRight,
   Menu,
   XIcon,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 /* ─────────────────────── LOGO ─────────────────────── */
@@ -143,7 +146,7 @@ const FloatingShapes = ({ variant = "hero" }: { variant?: string }) => {
   };
 
   return (
-    <>
+    <div className="dark:opacity-[0.25] transition-opacity duration-500">
       {(shapes[variant] || shapes.section).map((shape, i) => (
         <div
           key={i}
@@ -152,7 +155,7 @@ const FloatingShapes = ({ variant = "hero" }: { variant?: string }) => {
           aria-hidden
         />
       ))}
-    </>
+    </div>
   );
 };
 
@@ -193,7 +196,7 @@ const Avatar = ({
     .slice(0, 2);
   return (
     <div
-      className={`w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] ${bg} flex items-center justify-center text-[10px] font-bold uppercase tracking-wider ${
+      className={`w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 ${bg} flex items-center justify-center text-[10px] font-bold uppercase tracking-wider ${
         bg === "bg-white" || bg === "bg-[#FBBF24]"
           ? "text-[#0A0A0A]"
           : "text-white"
@@ -245,6 +248,110 @@ const marqueePosts = [
   ...baseMarqueePosts,
 ];
 
+/* ─────────── THEME TOGGLE ─────────── */
+const ThemeToggle = () => {
+  const { setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) {
+    return (
+      <div className="w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10" />
+    );
+  }
+
+  const isDark = resolvedTheme === "dark";
+
+  const toggleTheme = () => {
+    // Enable smooth transition on all elements
+    document.documentElement.classList.add("theme-transition");
+    // Switch theme instantly
+    setTheme(isDark ? "light" : "dark");
+    // Remove transition class after animation completes
+    setTimeout(() => {
+      document.documentElement.classList.remove("theme-transition");
+    }, 600);
+  };
+
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {/* Tooltip (Hidden on Mobile) */}
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: 4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.95 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="hidden md:block absolute top-full mt-2.5 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-[#0A0A0A] dark:bg-white text-white dark:text-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider whitespace-nowrap pointer-events-none z-999 border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[2px_2px_0px_0px_#2563EB]"
+          >
+            {isDark ? "Light Mode" : "Dark Mode"}
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0A0A0A] dark:bg-white rotate-45 border-l-[2px] border-t-[2px] border-[#0A0A0A] dark:border-white/20" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Button */}
+      <motion.button
+        onClick={() => {
+          toggleTheme();
+          setShowTooltip(false);
+        }}
+        className="relative w-9 h-9 cursor-pointer rounded-full border-[2px] border-[#0A0A0A] dark:border-white/25 bg-white dark:bg-white/10 flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.08)] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all overflow-hidden group"
+        whileTap={{ scale: 0.85 }}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      >
+        <div className="relative w-full h-full flex items-center justify-center">
+          {/* SUN - Always in DOM, animated via GPU */}
+          <motion.div
+            initial={false}
+            animate={{
+              opacity: isDark ? 1 : 0,
+              rotate: isDark ? 0 : -180,
+              scale: isDark ? 1 : 0.5,
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Sun className="w-4 h-4 text-[#FBBF24]" strokeWidth={2.5} />
+          </motion.div>
+
+          {/* MOON - Always in DOM, animated via GPU */}
+          <motion.div
+            initial={false}
+            animate={{
+              opacity: isDark ? 0 : 1,
+              rotate: isDark ? 180 : 0,
+              scale: isDark ? 0.5 : 1,
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Moon className="w-4 h-4 text-[#2563EB]" strokeWidth={2.5} />
+          </motion.div>
+        </div>
+
+        {/* Glow ring on hover */}
+        <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+          <div
+            className={`absolute inset-0 rounded-full transition-colors duration-300 ${
+              isDark
+                ? "shadow-[0_0_14px_#FBBF24,inset_0_0_8px_rgba(251,191,36,0.25)]"
+                : "shadow-[0_0_14px_#2563EB,inset_0_0_8px_rgba(37,99,235,0.2)]"
+            }`}
+          />
+        </div>
+      </motion.button>
+    </div>
+  );
+};
+
 /* ═══════════════════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════════════════ */
@@ -265,13 +372,13 @@ export default function TrendMind() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-[#0A0A0A] font-[family-name:var(--font-space-grotesk)] selection:bg-[#2563EB] selection:text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F5F5F5] font-[family-name:var(--font-space-grotesk)] selection:bg-[#2563EB] selection:text-white overflow-x-hidden relative">
       {/* ═══ GRID BACKGROUND ═══ */}
       <div
-        className="fixed inset-0 z-0 pointer-events-none opacity-[0.04]"
+        className="fixed inset-0 z-0 pointer-events-none opacity-[0.04] dark:opacity-[0.06]"
         style={{
           backgroundImage:
-            "linear-gradient(#0A0A0A 1px, transparent 1px), linear-gradient(90deg, #0A0A0A 1px, transparent 1px)",
+            "linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
@@ -285,11 +392,11 @@ export default function TrendMind() {
       >
         {/* Main Navbar Bar (Hidden when Mobile Menu is open) */}
         {!mobileMenu && (
-          <div className="px-5 lg:px-10 py-3.5 flex justify-between items-center relative z-50 bg-white/90 backdrop-blur-xl border-b-[3px] border-[#0A0A0A]">
+          <div className="px-5 lg:px-10 py-3.5 flex justify-between items-center relative z-50 bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-xl border-b-[3px] border-[#0A0A0A] dark:border-white/15">
             <div className="flex items-center gap-8">
               <a
                 href="#hero"
-                className="text-lg font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A]"
+                className="text-lg font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A] dark:text-white"
               >
                 <TrendMindLogo />
                 TrendMind
@@ -299,7 +406,7 @@ export default function TrendMind() {
                   <a
                     key={item}
                     href={`#${item.toLowerCase()}`}
-                    className="px-4 py-2 rounded-full border-[3px] border-transparent hover:border-[#0A0A0A] hover:shadow-[3px_3px_0px_0px_#0A0A0A] hover:bg-white transition-all duration-200 text-[#0A0A0A]"
+                    className="px-4 py-2 rounded-full border-[3px] border-transparent hover:border-[#0A0A0A] dark:hover:border-white/30 hover:shadow-[3px_3px_0px_0px_#0A0A0A] dark:hover:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] hover:bg-white dark:hover:bg-white/10 transition-all duration-200 text-[#0A0A0A] dark:text-white/80"
                   >
                     {item}
                   </a>
@@ -307,21 +414,22 @@ export default function TrendMind() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button className="font-bold text-xs uppercase hidden md:block hover:text-[#2563EB] transition-colors tracking-wider">
+              <ThemeToggle />
+              <button className="font-bold text-xs uppercase hidden md:block hover:text-[#2563EB] dark:hover:text-[#3b82f6] transition-colors tracking-wider">
                 Sign In
               </button>
 
               {/* Desktop Get Access Button with Arrow Icon */}
               <a
                 href="#pricing"
-                className="hidden md:inline-flex items-center gap-2 bg-[#2563EB] text-white rounded-full px-6 py-2.5 text-xs font-black uppercase border-[3px] border-[#0A0A0A] shadow-[4px_4px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all"
+                className="hidden md:inline-flex items-center gap-2 bg-[#2563EB] text-white rounded-full px-6 py-2.5 text-xs font-black uppercase border-[3px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all"
               >
                 Get Access <ArrowUpRight className="w-4 h-4" strokeWidth={3} />
               </a>
 
               {/* Mobile Menu Open Toggle */}
               <button
-                className="lg:hidden p-2 rounded-[0.8rem] border-[3px] border-[#0A0A0A] bg-white text-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
+                className="lg:hidden p-2 rounded-[0.8rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
                 onClick={() => setMobileMenu(true)}
               >
                 <Menu className="w-5 h-5" strokeWidth={2.5} />
@@ -333,7 +441,7 @@ export default function TrendMind() {
         {/* Scroll progress bar */}
         {!mobileMenu && (
           <motion.div
-            className="h-[3px] bg-[#2563EB] origin-left relative z-50"
+            className="h-[3px] bg-[#2563EB] dark:bg-[#3b82f6] origin-left relative z-50"
             style={{ scaleX }}
           />
         )}
@@ -347,13 +455,13 @@ export default function TrendMind() {
             animate={{ y: 0 }}
             exit={{ y: "-100%" }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[100] bg-[#FAFAFA] flex flex-col overflow-hidden"
+            className="fixed inset-0 z-[100] bg-[#FAFAFA] dark:bg-[#0A0A0A] flex flex-col overflow-hidden"
           >
             {/* Animated Background Elements (Grid & Shapes) */}
             <div className="absolute inset-0 z-0 pointer-events-none">
               {/* Background Grid */}
               <div
-                className="absolute inset-0 opacity-[0.4]"
+                className="absolute inset-0 opacity-[0.4] dark:opacity-[0.15]"
                 style={{
                   backgroundImage:
                     "linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)",
@@ -379,17 +487,17 @@ export default function TrendMind() {
             </div>
 
             {/* Header */}
-            <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A] bg-white relative z-10">
+            <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A] dark:border-white/15 bg-white dark:bg-[#111111] relative z-10">
               <a
                 href="#hero"
                 onClick={() => setMobileMenu(false)}
-                className="text-xl font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A]"
+                className="text-xl font-black font-display tracking-tight flex items-center gap-2 uppercase text-[#0A0A0A] dark:text-white"
               >
                 <TrendMindLogo />
                 TrendMind
               </a>
               <button
-                className="p-1.5 rounded-[0.8rem] border-[3px] border-[#0A0A0A] bg-white text-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
+                className="p-1.5 rounded-[0.8rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
                 onClick={() => setMobileMenu(false)}
               >
                 <XIcon className="w-6 h-6" strokeWidth={2.5} />
@@ -406,7 +514,7 @@ export default function TrendMind() {
                   transition={{ delay: i * 0.1 }}
                   href={`#${item.toLowerCase()}`}
                   onClick={() => setMobileMenu(false)}
-                  className="w-full text-center py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] bg-white text-[#0A0A0A] font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
+                  className="w-full text-center py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all"
                 >
                   {item}
                 </motion.a>
@@ -419,7 +527,7 @@ export default function TrendMind() {
                 transition={{ delay: 0.4 }}
                 href="#pricing"
                 onClick={() => setMobileMenu(false)}
-                className="w-full flex items-center justify-center gap-2 py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] bg-[#2563EB] text-white font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all mt-2"
+                className="w-full flex items-center justify-center gap-2 py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-[#2563EB] text-white font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all mt-2"
               >
                 Get Access <ArrowUpRight className="w-5 h-5" strokeWidth={3} />
               </motion.a>
@@ -444,10 +552,10 @@ export default function TrendMind() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[60] bg-[#FAFAFA] lg:hidden flex flex-col"
+            className="fixed inset-0 z-[60] bg-[#FAFAFA] dark:bg-[#0A0A0A] lg:hidden flex flex-col"
           >
             {/* Top bar */}
-            <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A]">
+            <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A] dark:border-white/15">
               <a
                 href="#hero"
                 onClick={() => setMobileMenu(false)}
@@ -457,7 +565,7 @@ export default function TrendMind() {
                 TrendMind
               </a>
               <button
-                className="p-2 rounded-xl border-[2px] border-[#0A0A0A] bg-white"
+                className="p-2 rounded-xl border-[2px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10"
                 onClick={() => setMobileMenu(false)}
               >
                 <XIcon className="w-5 h-5" />
@@ -474,7 +582,7 @@ export default function TrendMind() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.08 }}
-                  className="w-full max-w-xs text-center px-6 py-4 rounded-2xl border-[3px] border-[#0A0A0A] font-bold text-lg uppercase tracking-wider hover:bg-[#FBBF24] transition-colors shadow-[4px_4px_0px_0px_#0A0A0A] bg-white"
+                  className="w-full max-w-xs text-center px-6 py-4 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/20 font-bold text-lg uppercase tracking-wider hover:bg-[#FBBF24] transition-colors shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] bg-white dark:bg-white/10 dark:text-white"
                 >
                   {item}
                 </motion.a>
@@ -485,7 +593,7 @@ export default function TrendMind() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="w-full max-w-xs text-center px-6 py-4 rounded-2xl border-[3px] border-[#0A0A0A] bg-[#2563EB] text-white font-bold text-lg uppercase tracking-wider shadow-[4px_4px_0px_0px_#0A0A0A]"
+                className="w-full max-w-xs text-center px-6 py-4 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/20 bg-[#2563EB] text-white font-bold text-lg uppercase tracking-wider shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)]"
               >
                 Get Access
               </motion.a>
@@ -513,27 +621,13 @@ export default function TrendMind() {
           <FloatingShapes variant="hero" />
 
           {/* ── Glow Orbs ── */}
-          <div className="absolute top-1/4 left-[10%] w-[420px] h-[420px] bg-[#2563EB]/[0.07] rounded-full blur-[100px] animate-glow-drift pointer-events-none" />
-          <div className="absolute bottom-1/4 right-[8%] w-[360px] h-[360px] bg-[#FBBF24]/[0.08] rounded-full blur-[90px] animate-glow-drift-2 pointer-events-none" />
-          <div className="absolute top-[60%] left-[45%] w-[280px] h-[280px] bg-[#E64833]/[0.05] rounded-full blur-[80px] animate-glow-drift pointer-events-none" />
-
-          {/* ── Orbit Rings ── */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] pointer-events-none">
-            <div className="absolute inset-0 border-[1.5px] border-dashed border-[#2563EB]/[0.08] rounded-full animate-orbit" />
-            <div className="absolute inset-8 border-[1.5px] border-dashed border-[#FBBF24]/[0.1] rounded-full animate-orbit-reverse" />
-            <div
-              className="absolute inset-20 border-[1px] border-[#0A0A0A]/[0.04] rounded-full animate-orbit"
-              style={{ animationDuration: "35s" }}
-            />
-            {/* Orbiting dots */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#2563EB] rounded-full opacity-30 shadow-[0_0_12px_#2563EB]" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-[#FBBF24] rounded-full opacity-40 shadow-[0_0_10px_#FBBF24]" />
-            <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#E64833] rounded-full opacity-30 shadow-[0_0_8px_#E64833]" />
-          </div>
+          <div className="absolute top-1/4 left-[10%] w-[420px] h-[420px] bg-[#2563EB]/[0.07] dark:bg-[#2563EB]/[0.15] rounded-full blur-[100px] animate-glow-drift pointer-events-none" />
+          <div className="absolute bottom-1/4 right-[8%] w-[360px] h-[360px] bg-[#FBBF24]/[0.08] dark:bg-[#FBBF24]/[0.12] rounded-full blur-[90px] animate-glow-drift-2 pointer-events-none" />
+          <div className="absolute top-[60%] left-[45%] w-[280px] h-[280px] bg-[#E64833]/[0.05] dark:bg-[#E64833]/[0.1] rounded-full blur-[80px] animate-glow-drift pointer-events-none" />
 
           {/* ── Grain Overlay ── */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.03] animate-grain"
+            className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.015] animate-grain"
             style={{
               backgroundImage:
                 'url("data:image/svg+xml,%3Csvg viewBox=%270 0 256 256%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E")',
@@ -546,7 +640,7 @@ export default function TrendMind() {
           {[...Array(6)].map((_, i) => (
             <div
               key={`dot-${i}`}
-              className="absolute w-1.5 h-1.5 rounded-full bg-[#2563EB] opacity-20 animate-float"
+              className="absolute w-1.5 h-1.5 rounded-full bg-[#2563EB] opacity-20 dark:opacity-30 animate-float"
               style={{
                 top: `${15 + i * 14}%`,
                 left: `${5 + i * 16}%`,
@@ -558,7 +652,7 @@ export default function TrendMind() {
           {[...Array(5)].map((_, i) => (
             <div
               key={`dot2-${i}`}
-              className="absolute w-1 h-1 rounded-full bg-[#FBBF24] opacity-25 animate-float-reverse"
+              className="absolute w-1 h-1 rounded-full bg-[#FBBF24] opacity-25 dark:opacity-35 animate-float-reverse"
               style={{
                 top: `${20 + i * 15}%`,
                 right: `${4 + i * 12}%`,
@@ -584,8 +678,8 @@ export default function TrendMind() {
               { label: "Data-Driven", bg: "bg-[#2563EB]", text: "text-white" },
               {
                 label: "Growth-Focused",
-                bg: "bg-white",
-                text: "text-[#0A0A0A]",
+                bg: "bg-white dark:bg-white/15",
+                text: "text-[#0A0A0A] dark:text-white",
               },
             ].map((badge, i) => (
               <motion.span
@@ -593,7 +687,7 @@ export default function TrendMind() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                className={`${badge.bg} ${badge.text} border-[2px] border-[#0A0A0A] px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A]`}
+                className={`${badge.bg} ${badge.text} border-[2px] border-[#0A0A0A] dark:border-white/20 px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)]`}
               >
                 {badge.label}
               </motion.span>
@@ -628,7 +722,7 @@ export default function TrendMind() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-base md:text-lg font-medium text-[#0A0A0A]/70 max-w-2xl mx-auto mb-8 z-10 relative leading-relaxed"
+            className="text-base md:text-lg font-medium text-[#0A0A0A]/70 dark:text-white/60 max-w-2xl mx-auto mb-8 z-10 relative leading-relaxed"
           >
             Craft high-performing LinkedIn posts with AI-powered strategy and
             data-driven insights. Professional content that drives
@@ -644,13 +738,13 @@ export default function TrendMind() {
           >
             <a
               href="#pricing"
-              className="bg-[#2563EB] text-white rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] shadow-[4px_4px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all flex items-center justify-center gap-2 tracking-wide"
+              className="bg-[#2563EB] text-white rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all flex items-center justify-center gap-2 tracking-wide"
             >
               Get Early Access <ArrowUpRight className="w-4 h-4" />
             </a>
             <button
               onClick={() => setShowDemo(true)}
-              className="bg-white text-[#0A0A0A] rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] shadow-[4px_4px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all flex items-center justify-center gap-2 tracking-wide hover:bg-[#FBBF24]"
+              className="bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all flex items-center justify-center gap-2 tracking-wide hover:bg-[#FBBF24] dark:hover:bg-[#FBBF24] dark:hover:text-[#0A0A0A]"
             >
               <Play className="w-4 h-4 fill-current" /> Watch Demo
             </button>
@@ -681,7 +775,7 @@ export default function TrendMind() {
               },
             ].map((stat, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] flex items-center justify-center bg-white">
+                <div className="w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center bg-white dark:bg-white/10">
                   {stat.icon}
                 </div>
                 <div className="text-left">
@@ -699,8 +793,8 @@ export default function TrendMind() {
 
         {/* ═══════════════ MARQUEE ═══════════════ */}
         <section className="w-full relative pb-20 overflow-hidden">
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#FAFAFA] to-transparent z-20 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#FAFAFA] to-transparent z-20 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#FAFAFA] dark:from-[#0A0A0A] to-transparent z-20 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#FAFAFA] dark:from-[#0A0A0A] to-transparent z-20 pointer-events-none" />
 
           <motion.div
             className="flex gap-5 w-max px-5"
@@ -710,7 +804,7 @@ export default function TrendMind() {
             {marqueePosts.map((post, i) => (
               <div
                 key={i}
-                className="w-[340px] bg-white border-[2px] border-[#0A0A0A] rounded-2xl p-5 shadow-[4px_4px_0px_0px_#0A0A0A] flex flex-col shrink-0 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_0px_#2563EB] transition-all cursor-pointer group"
+                className="w-[340px] bg-white dark:bg-[#141414] border-[2px] border-[#0A0A0A] dark:border-white/15 rounded-2xl p-5 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.08)] flex flex-col shrink-0 hover:-translate-y-1.5 hover:shadow-[6px_6px_0px_0px_#2563EB] dark:hover:shadow-[6px_6px_0px_0px_#3b82f6] transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2.5">
@@ -724,7 +818,7 @@ export default function TrendMind() {
                       </div>
                     </div>
                   </div>
-                  <div className="bg-white px-2 py-1 rounded-full border-[2px] border-[#0A0A0A] text-[10px] font-bold uppercase flex items-center gap-1">
+                  <div className="bg-white dark:bg-white/10 px-2 py-1 rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 text-[10px] font-bold uppercase flex items-center gap-1">
                     <Zap className="w-3 h-3 fill-[#FBBF24] text-[#FBBF24]" />{" "}
                     {post.score}
                   </div>
@@ -732,7 +826,7 @@ export default function TrendMind() {
                 <p className="font-medium text-sm leading-relaxed mb-3 line-clamp-3">
                   {post.text}
                 </p>
-                <div className="mt-auto pt-3 border-t-[2px] border-[#0A0A0A]/10 flex justify-between items-center font-bold text-[10px] uppercase">
+                <div className="mt-auto pt-3 border-t-[2px] border-[#0A0A0A]/10 dark:border-white/10 flex justify-between items-center font-bold text-[10px] uppercase">
                   <span className="flex items-center gap-1">
                     <BarChart3 className="w-3 h-3 text-[#2563EB]" />{" "}
                     {post.metrics}
@@ -749,13 +843,13 @@ export default function TrendMind() {
         {/* ═══════════════ 2. HOW IT WORKS ═══════════════ */}
         <section
           id="about"
-          className="py-24 px-5 bg-white border-y-[3px] border-[#0A0A0A] relative overflow-hidden"
+          className="py-24 px-5 bg-white dark:bg-[#111111] border-y-[3px] border-[#0A0A0A] dark:border-white/15 relative overflow-hidden"
         >
           <FloatingShapes variant="section" />
           <div className="max-w-5xl mx-auto relative z-10">
             <Reveal>
               <div className="text-center mb-16">
-                <span className="inline-block bg-[#FBBF24] border-[2px] border-[#0A0A0A] px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] mb-4">
+                <span className="inline-block bg-[#FBBF24] border-[2px] border-[#0A0A0A] dark:border-white/20 px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] mb-4 text-[#0A0A0A]">
                   How It Works
                 </span>
                 <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-3">
@@ -769,7 +863,7 @@ export default function TrendMind() {
 
             <div className="grid md:grid-cols-3 gap-8 md:gap-10 relative">
               {/* Connector line */}
-              <div className="hidden md:block absolute top-10 left-[15%] right-[15%] h-[3px] bg-[#0A0A0A] z-0" />
+              <div className="hidden md:block absolute top-10 left-[15%] right-[15%] h-[3px] bg-[#0A0A0A] dark:bg-white/20 z-0" />
 
               {[
                 {
@@ -790,15 +884,15 @@ export default function TrendMind() {
                   step: "03",
                   title: "Schedule & Grow",
                   desc: "Auto-schedule at optimal times and watch engagement soar.",
-                  bg: "bg-white",
-                  text: "text-[#0A0A0A]",
+                  bg: "bg-white dark:bg-[#1A1A1A]",
+                  text: "text-[#0A0A0A] dark:text-white",
                 },
               ].map((item, i) => (
                 <Reveal key={i} delay={i * 0.15}>
                   <div
-                    className={`${item.bg} ${item.text} p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] relative group hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#0A0A0A] transition-all mt-8 md:mt-0`}
+                    className={`${item.bg} ${item.text} p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[6px_6px_0px_0px_#0A0A0A] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.08)] relative group hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#0A0A0A] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.12)] transition-all mt-8 md:mt-0`}
                   >
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-white border-[3px] border-[#0A0A0A] rounded-full flex items-center justify-center font-bold text-lg shadow-[3px_3px_0px_0px_#0A0A0A] text-[#0A0A0A]">
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-white dark:bg-[#1A1A1A] border-[3px] border-[#0A0A0A] dark:border-white/20 rounded-full flex items-center justify-center font-bold text-lg shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] text-[#0A0A0A] dark:text-white">
                       {item.step}
                     </div>
                     <div className="relative z-10 mt-6 text-center">
@@ -819,20 +913,20 @@ export default function TrendMind() {
         {/* ═══════════════ 3. FEATURES ═══════════════ */}
         <section
           id="features"
-          className="py-24 lg:py-36 px-5 bg-[#FAFAFA] relative overflow-hidden"
+          className="py-24 lg:py-36 px-5 bg-[#FAFAFA] dark:bg-[#0A0A0A] relative overflow-hidden"
         >
           {/* Section bg elements */}
           <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[#2563EB]/[0.04] rounded-full blur-[80px]" />
-            <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#FBBF24]/[0.05] rounded-full blur-[70px]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border-[1px] border-dashed border-[#0A0A0A]/[0.04] rounded-full animate-orbit" />
+            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[#2563EB]/[0.04] dark:bg-[#2563EB]/[0.08] rounded-full blur-[80px]" />
+            <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#FBBF24]/[0.05] dark:bg-[#FBBF24]/[0.08] rounded-full blur-[70px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border-[1px] border-dashed border-[#0A0A0A]/[0.04] dark:border-white/[0.06] rounded-full animate-orbit" />
           </div>
 
           <div className="max-w-6xl mx-auto relative z-10">
             {/* Section header */}
             <Reveal>
               <div className="text-center mb-16 lg:mb-20">
-                <span className="inline-block bg-[#2563EB] text-white border-[2px] border-[#0A0A0A] px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] mb-5">
+                <span className="inline-block bg-[#2563EB] text-white border-[2px] border-[#0A0A0A] dark:border-white/20 px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] mb-5">
                   Features
                 </span>
                 <h2 className="text-3xl md:text-5xl lg:text-[3.5rem] font-bold uppercase tracking-tight mb-4 leading-[1.1]">
@@ -849,7 +943,7 @@ export default function TrendMind() {
                     />
                   </span>
                 </h2>
-                <p className="text-base md:text-lg font-medium text-[#0A0A0A]/60 max-w-xl mx-auto">
+                <p className="text-base md:text-lg font-medium text-[#0A0A0A]/60 dark:text-white/50 max-w-xl mx-auto">
                   AI-powered tools that transform your content strategy from
                   guesswork into a science.
                 </p>
@@ -865,7 +959,7 @@ export default function TrendMind() {
                     y: -8,
                     transition: { type: "spring", stiffness: 400, damping: 20 },
                   }}
-                  className="bg-[#FBBF24] p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#2563EB] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                  className="bg-[#FBBF24] p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[6px_6px_0px_0px_#0A0A0A] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.08)] hover:shadow-[8px_8px_0px_0px_#2563EB] dark:hover:shadow-[8px_8px_0px_0px_#3b82f6] transition-shadow relative overflow-hidden group cursor-pointer h-full"
                 >
                   {/* Shimmer overlay */}
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -873,7 +967,7 @@ export default function TrendMind() {
                   </div>
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-5">
-                      <div className="w-11 h-11 bg-white rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
+                      <div className="w-11 h-11 bg-white dark:bg-black/80 rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
                         <LineChart className="w-5 h-5" />
                       </div>
                       <div>
@@ -899,7 +993,9 @@ export default function TrendMind() {
                             ease: [0.25, 0.1, 0.25, 1],
                           }}
                           className={`flex-1 rounded-t-lg border-[2px] border-[#0A0A0A] transition-colors duration-300 ${
-                            i >= 7 ? "bg-[#2563EB]" : "bg-white"
+                            i >= 7
+                              ? "bg-[#2563EB]"
+                              : "bg-white dark:bg-white/90"
                           }`}
                         />
                       ))}
@@ -908,7 +1004,7 @@ export default function TrendMind() {
                       <span className="text-2xl md:text-3xl font-bold tracking-tight">
                         +340%
                       </span>
-                      <span className="bg-white px-3 py-1.5 rounded-full border-[2px] border-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#0A0A0A]">
+                      <span className="bg-white dark:bg-white/90 px-3 py-1.5 rounded-full border-[2px] border-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#0A0A0A] text-[#0A0A0A]">
                         ↑ Engagement
                       </span>
                     </div>
@@ -923,7 +1019,7 @@ export default function TrendMind() {
                     y: -8,
                     transition: { type: "spring", stiffness: 400, damping: 20 },
                   }}
-                  className="bg-[#2563EB] text-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                  className="bg-[#2563EB] text-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[6px_6px_0px_0px_#0A0A0A] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.08)] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
                 >
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:animate-shimmer" />
@@ -976,14 +1072,14 @@ export default function TrendMind() {
                     y: -8,
                     transition: { type: "spring", stiffness: 400, damping: 20 },
                   }}
-                  className="bg-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                  className="bg-white dark:bg-[#141414] p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[6px_6px_0px_0px_#0A0A0A] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.08)] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
                 >
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#FBBF24]/20 to-transparent group-hover:animate-shimmer" />
                   </div>
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-5">
-                      <div className="w-11 h-11 bg-[#FAFAFA] rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
+                      <div className="w-11 h-11 bg-[#FAFAFA] dark:bg-white/10 rounded-xl border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)]">
                         <Calendar className="w-5 h-5" />
                       </div>
                       <h3 className="font-bold text-lg uppercase tracking-tight">
@@ -1006,12 +1102,12 @@ export default function TrendMind() {
                             repeat: Infinity,
                             delay: i === 5 ? 0.5 : 0,
                           }}
-                          className={`aspect-square rounded-lg border-[2px] border-[#0A0A0A] flex items-center justify-center font-bold text-xs ${
+                          className={`aspect-square rounded-lg border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center font-bold text-xs ${
                             i === 2
-                              ? "bg-[#FBBF24] shadow-[2px_2px_0px_0px_#0A0A0A]"
+                              ? "bg-[#FBBF24] shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] text-[#0A0A0A]"
                               : i === 5
-                                ? "bg-[#2563EB] text-white shadow-[2px_2px_0px_0px_#0A0A0A]"
-                                : "bg-[#FAFAFA]"
+                                ? "bg-[#2563EB] text-white shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)]"
+                                : "bg-[#FAFAFA] dark:bg-white/5"
                           }`}
                         >
                           {i + 14}
@@ -1029,14 +1125,14 @@ export default function TrendMind() {
                     y: -8,
                     transition: { type: "spring", stiffness: 400, damping: 20 },
                   }}
-                  className="bg-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] hover:shadow-[8px_8px_0px_0px_#E64833] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                  className="bg-white dark:bg-[#141414] p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[6px_6px_0px_0px_#0A0A0A] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.08)] hover:shadow-[8px_8px_0px_0px_#E64833] transition-shadow relative overflow-hidden group cursor-pointer h-full"
                 >
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#E64833]/10 to-transparent group-hover:animate-shimmer" />
                   </div>
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-5">
-                      <div className="w-11 h-11 bg-[#FAFAFA] rounded-xl border-[2px] border-[#0A0A0A] flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A]">
+                      <div className="w-11 h-11 bg-[#FAFAFA] dark:bg-white/10 rounded-xl border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)]">
                         <Activity className="w-5 h-5" />
                       </div>
                       <h3 className="font-bold text-lg uppercase tracking-tight">
@@ -1054,7 +1150,7 @@ export default function TrendMind() {
                         repeat: Infinity,
                         ease: "easeInOut",
                       }}
-                      className="bg-[#FAFAFA] p-4 rounded-xl border-[2px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#FBBF24]"
+                      className="bg-[#FAFAFA] dark:bg-[#1A1A1A] p-4 rounded-xl border-[2px] border-[#0A0A0A] dark:border-white/15 shadow-[3px_3px_0px_0px_#FBBF24]"
                     >
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">
@@ -1111,7 +1207,7 @@ export default function TrendMind() {
                     y: -8,
                     transition: { type: "spring", stiffness: 400, damping: 20 },
                   }}
-                  className="bg-gradient-to-br from-[#2563EB] to-[#0A0A0A] text-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#FBBF24] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
+                  className="bg-gradient-to-br from-[#2563EB] to-[#0A0A0A] text-white p-7 md:p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[6px_6px_0px_0px_#FBBF24] hover:shadow-[8px_8px_0px_0px_#FBBF24] transition-shadow relative overflow-hidden group cursor-pointer h-full"
                 >
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:animate-shimmer" />
@@ -1247,7 +1343,7 @@ export default function TrendMind() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 * i }}
-                    className="px-4 py-2 rounded-full border-[2px] border-[#0A0A0A] bg-white text-[10px] font-bold uppercase tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 hover:bg-[#FBBF24] transition-all cursor-default"
+                    className="px-4 py-2 rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10 text-[10px] font-bold uppercase tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 hover:bg-[#FBBF24] dark:hover:bg-[#FBBF24] dark:hover:text-[#0A0A0A] transition-all cursor-default"
                   >
                     {pill}
                   </motion.span>
@@ -1258,13 +1354,13 @@ export default function TrendMind() {
         </section>
 
         {/* ═══════════════ 4. TESTIMONIALS ═══════════════ */}
-        <section className="py-24 lg:py-32 px-5 border-y-[3px] border-[#0A0A0A] bg-[#FAFAFA] relative overflow-hidden">
+        <section className="py-24 lg:py-32 px-5 border-y-[3px] border-[#0A0A0A] dark:border-white/15 bg-[#FAFAFA] dark:bg-[#0A0A0A] relative overflow-hidden">
           <FloatingShapes variant="section" />
 
           <div className="max-w-6xl mx-auto relative z-10">
             <Reveal>
               <div className="text-center mb-16">
-                <span className="inline-block bg-white border-[2px] border-[#0A0A0A] px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] mb-4">
+                <span className="inline-block bg-white dark:bg-white/10 border-[2px] border-[#0A0A0A] dark:border-white/20 px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] mb-4">
                   Testimonials
                 </span>
                 <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-3">
@@ -1314,7 +1410,7 @@ export default function TrendMind() {
               ].map((review, i) => (
                 <Reveal key={i} delay={i * 0.12}>
                   <div
-                    className={`bg-white p-7 rounded-2xl border-[3px] border-[#0A0A0A] relative hover:-translate-y-2 transition-all ${review.mt}`}
+                    className={`bg-white dark:bg-[#141414] p-7 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 relative hover:-translate-y-2 transition-all ${review.mt}`}
                     style={{
                       boxShadow: `6px 6px 0px 0px ${review.shadow}`,
                     }}
@@ -1337,12 +1433,12 @@ export default function TrendMind() {
                       &ldquo;{review.text}&rdquo;
                     </p>
 
-                    <div className="flex flex-col gap-3 border-t-[2px] border-[#0A0A0A]/10 pt-5">
+                    <div className="flex flex-col gap-3 border-t-[2px] border-[#0A0A0A]/10 dark:border-white/10 pt-5">
                       <div className="flex justify-between items-center">
                         <div className="text-3xl font-bold tracking-tight">
                           {review.stat}
                         </div>
-                        <div className="bg-[#FAFAFA] px-2.5 py-1 rounded-lg border-[2px] border-[#0A0A0A] text-[9px] font-bold uppercase">
+                        <div className="bg-[#FAFAFA] dark:bg-white/10 px-2.5 py-1 rounded-lg border-[2px] border-[#0A0A0A] dark:border-white/20 text-[9px] font-bold uppercase">
                           {review.label}
                         </div>
                       </div>
@@ -1368,7 +1464,7 @@ export default function TrendMind() {
         {/* ═══════════════ 5. PRICING ═══════════════ */}
         <section
           id="pricing"
-          className="py-24 lg:py-32 px-5 bg-white relative overflow-hidden border-b-[3px] border-[#0A0A0A]"
+          className="py-24 lg:py-32 px-5 bg-white dark:bg-[#111111] relative overflow-hidden border-b-[3px] border-[#0A0A0A] dark:border-white/15"
         >
           <FloatingShapes variant="pricing" />
 
@@ -1387,13 +1483,13 @@ export default function TrendMind() {
           <div className="max-w-5xl mx-auto relative z-10">
             <Reveal>
               <div className="text-center mb-16">
-                <span className="inline-block bg-[#FBBF24] border-[2px] border-[#0A0A0A] px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] mb-4">
+                <span className="inline-block bg-[#FBBF24] border-[2px] border-[#0A0A0A] dark:border-white/20 px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] mb-4 text-[#0A0A0A]">
                   Pricing
                 </span>
                 <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-3">
                   Simple, Honest Pricing
                 </h2>
-                <p className="text-base font-medium text-[#0A0A0A]/60">
+                <p className="text-base font-medium text-[#0A0A0A]/60 dark:text-white/50">
                   Start for free. Scale when you&apos;re ready.
                 </p>
               </div>
@@ -1405,10 +1501,10 @@ export default function TrendMind() {
                 <motion.div
                   whileHover={{ y: -6 }}
                   transition={{ type: "spring", stiffness: 300 }}
-                  className="bg-[#FAFAFA] p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A] relative z-10"
+                  className="bg-[#FAFAFA] dark:bg-[#1A1A1A] p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[6px_6px_0px_0px_#0A0A0A] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.08)] relative z-10"
                 >
                   {/* Inner geometric accent */}
-                  <div className="absolute top-4 right-4 w-10 h-10 border-[2px] border-[#0A0A0A] rounded-full opacity-10" />
+                  <div className="absolute top-4 right-4 w-10 h-10 border-[2px] border-[#0A0A0A] dark:border-white/10 rounded-full opacity-10" />
                   <div
                     className="absolute bottom-6 right-8 w-6 h-6 bg-[#FBBF24] opacity-10"
                     style={{
@@ -1426,7 +1522,7 @@ export default function TrendMind() {
                     $0
                     <span className="text-lg opacity-40 font-medium">/mo</span>
                   </div>
-                  <div className="text-[#2563EB] font-bold uppercase text-[10px] mb-7 tracking-widest bg-white inline-block px-3 py-1 border-[2px] border-[#0A0A0A] rounded-full">
+                  <div className="text-[#2563EB] dark:text-[#3b82f6] font-bold uppercase text-[10px] mb-7 tracking-widest bg-white dark:bg-white/10 inline-block px-3 py-1 border-[2px] border-[#0A0A0A] dark:border-white/20 rounded-full">
                     10 generations/mo
                   </div>
                   <ul className="space-y-3 mb-8 text-sm font-semibold uppercase">
@@ -1436,14 +1532,14 @@ export default function TrendMind() {
                       "Content Templates",
                     ].map((feat, i) => (
                       <li key={i} className="flex items-center gap-2.5">
-                        <div className="w-5 h-5 rounded-full bg-white border-[2px] border-[#0A0A0A] flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-white dark:bg-white/10 border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center">
                           <Check className="w-3 h-3" />
                         </div>
                         {feat}
                       </li>
                     ))}
                   </ul>
-                  <button className="w-full bg-white text-[#0A0A0A] py-3.5 rounded-full text-sm font-bold uppercase border-[2px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all tracking-wide">
+                  <button className="w-full bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white py-3.5 rounded-full text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all tracking-wide">
                     Get Started
                   </button>
                 </motion.div>
@@ -1458,10 +1554,10 @@ export default function TrendMind() {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className="bg-[#2563EB] text-white p-8 rounded-2xl border-[3px] border-[#0A0A0A] shadow-[10px_10px_0px_0px_#0A0A0A] relative z-20"
+                  className="bg-[#2563EB] text-white p-8 rounded-2xl border-[3px] border-[#0A0A0A] dark:border-white/15 shadow-[10px_10px_0px_0px_#0A0A0A] dark:shadow-[10px_10px_0px_0px_rgba(255,255,255,0.08)] relative z-20"
                 >
                   {/* Discount badge */}
-                  <div className="absolute -top-4 -right-4 bg-[#FBBF24] text-[#0A0A0A] w-20 h-20 rounded-full flex items-center justify-center text-center leading-tight font-bold uppercase border-[3px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] rotate-12 text-sm">
+                  <div className="absolute -top-4 -right-4 bg-[#FBBF24] text-[#0A0A0A] w-20 h-20 rounded-full flex items-center justify-center text-center leading-tight font-bold uppercase border-[3px] border-[#0A0A0A] dark:border-white/20 shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] rotate-12 text-sm">
                     75%
                     <br />
                     OFF
@@ -1533,7 +1629,7 @@ export default function TrendMind() {
         {/* ═══════════════ 6. FAQ ═══════════════ */}
         <section
           id="faq"
-          className="py-24 lg:py-32 px-5 border-b-[3px] border-[#0A0A0A] bg-[#FAFAFA] relative overflow-hidden"
+          className="py-24 lg:py-32 px-5 border-b-[3px] border-[#0A0A0A] dark:border-white/15 bg-[#FAFAFA] dark:bg-[#0A0A0A] relative overflow-hidden"
         >
           <FloatingShapes variant="faq" />
 
@@ -1546,7 +1642,7 @@ export default function TrendMind() {
           <div className="max-w-3xl mx-auto relative z-10">
             <Reveal>
               <div className="text-center mb-14">
-                <span className="inline-block bg-white border-[2px] border-[#0A0A0A] px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] mb-4">
+                <span className="inline-block bg-white dark:bg-white/10 border-[2px] border-[#0A0A0A] dark:border-white/20 px-4 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-widest shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] mb-4">
                   FAQ
                 </span>
                 <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-3">
@@ -1588,22 +1684,22 @@ export default function TrendMind() {
               ].map((faq, i) => (
                 <Reveal key={i} delay={i * 0.08}>
                   <div
-                    className={`border-[3px] border-[#0A0A0A] rounded-2xl overflow-hidden transition-all group ${
+                    className={`border-[3px] border-[#0A0A0A] dark:border-white/15 rounded-2xl overflow-hidden transition-all group ${
                       activeFaq === i
-                        ? "bg-white shadow-[6px_6px_0px_0px_#2563EB]"
-                        : "bg-white shadow-[4px_4px_0px_0px_#0A0A0A] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#0A0A0A]"
+                        ? "bg-white dark:bg-[#141414] shadow-[6px_6px_0px_0px_#2563EB]"
+                        : "bg-white dark:bg-[#141414] shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.08)] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#0A0A0A] dark:hover:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.1)]"
                     }`}
                   >
                     <button
                       onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                      className="w-full text-left p-5 font-bold uppercase text-sm flex justify-between items-center gap-4 hover:bg-[#FBBF24]/30 transition-colors"
+                      className="w-full text-left p-5 font-bold uppercase text-sm flex justify-between items-center gap-4 hover:bg-[#FBBF24]/30 dark:hover:bg-[#FBBF24]/10 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-8 h-8 rounded-lg border-[2px] border-[#0A0A0A] flex items-center justify-center transition-colors ${
+                          className={`w-8 h-8 rounded-lg border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center transition-colors ${
                             activeFaq === i
                               ? "bg-[#2563EB] text-white"
-                              : "bg-[#FAFAFA]"
+                              : "bg-[#FAFAFA] dark:bg-white/10"
                           }`}
                         >
                           {faq.icon}
@@ -1611,10 +1707,10 @@ export default function TrendMind() {
                         <span className="leading-snug">{faq.q}</span>
                       </div>
                       <div
-                        className={`w-8 h-8 border-[2px] border-[#0A0A0A] rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                        className={`w-8 h-8 border-[2px] border-[#0A0A0A] dark:border-white/20 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
                           activeFaq === i
                             ? "rotate-45 bg-[#2563EB] text-white"
-                            : "bg-white group-hover:bg-[#FBBF24]"
+                            : "bg-white dark:bg-white/10 group-hover:bg-[#FBBF24] dark:group-hover:bg-[#FBBF24]"
                         }`}
                       >
                         <Plus className="w-4 h-4" />
@@ -1627,7 +1723,7 @@ export default function TrendMind() {
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3 }}
-                          className="border-t-[3px] border-[#0A0A0A] bg-[#FAFAFA]"
+                          className="border-t-[3px] border-[#0A0A0A] dark:border-white/15 bg-[#FAFAFA] dark:bg-[#0A0A0A]"
                         >
                           <p className="p-5 font-medium text-sm leading-relaxed opacity-70">
                             {faq.a}
@@ -1643,7 +1739,7 @@ export default function TrendMind() {
         </section>
 
         {/* ═══════════════ 7. PRE-FOOTER CTA ═══════════════ */}
-        <section className="py-20 px-5 bg-[#FBBF24] text-center border-b-[3px] border-[#0A0A0A] relative overflow-hidden">
+        <section className="py-20 px-5 bg-[#FBBF24] dark:bg-[#FBBF24]/90 text-center border-b-[3px] border-[#0A0A0A] dark:border-white/15 relative overflow-hidden">
           {/* Bauhaus geometric BG */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-16 -left-16 w-48 h-48 border-[4px] border-[#0A0A0A] rounded-full opacity-10" />
@@ -1676,7 +1772,7 @@ export default function TrendMind() {
       </main>
 
       {/* ═══════════════ 8. FOOTER ═══════════════ */}
-      <footer className="bg-[#0A0A0A] text-white relative overflow-hidden">
+      <footer className="bg-[#0A0A0A] dark:bg-[#050505] text-white relative overflow-hidden">
         {/* Geometric accents */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-10 right-[10%] w-24 h-24 border-[2px] border-white/10 rounded-full" />
@@ -1825,7 +1921,7 @@ export default function TrendMind() {
             exit={{ opacity: 0, scale: 0, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-[#0A0A0A] text-white rounded-full border-[2px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#2563EB] flex items-center justify-center hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all hover:bg-[#2563EB] group"
+            className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-[#0A0A0A] dark:bg-white text-white dark:text-[#0A0A0A] rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[3px_3px_0px_0px_#2563EB] flex items-center justify-center hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all hover:bg-[#2563EB] dark:hover:bg-[#2563EB] dark:hover:text-white group"
             aria-label="Back to top"
           >
             <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
@@ -1854,7 +1950,7 @@ export default function TrendMind() {
               {/* Close button */}
               <button
                 onClick={() => setShowDemo(false)}
-                className="absolute -top-14 right-0 w-10 h-10 bg-white text-[#0A0A0A] rounded-full border-[2px] border-[#0A0A0A] flex items-center justify-center hover:bg-[#FBBF24] transition-colors shadow-[3px_3px_0px_0px_#2563EB]"
+                className="absolute -top-14 right-0 w-10 h-10 bg-white dark:bg-[#1A1A1A] text-[#0A0A0A] dark:text-white rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center hover:bg-[#FBBF24] transition-colors shadow-[3px_3px_0px_0px_#2563EB]"
               >
                 <X className="w-5 h-5" />
               </button>

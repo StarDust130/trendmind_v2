@@ -1,11 +1,22 @@
 @import "tailwindcss";
 
+/* Tell Tailwind v4 to use class-based dark mode (for next-themes) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #fafafa;
   --foreground: #0a0a0a;
   --blue: #2563eb;
   --yellow: #fbbf24;
   --red: #e64833;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --blue: #3b82f6;
+  --yellow: #fbbf24;
+  --red: #ef4444;
 }
 
 @theme inline {
@@ -17,6 +28,14 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Smooth theme transition */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.4s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, fill 0.3s ease, stroke 0.3s ease !important;
 }
 
 body {
@@ -46,6 +65,21 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #2563eb;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #333;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+.dark ::selection {
+  background: #3b82f6;
+  color: white;
 }
 
 /* Keyframes for floating geometric elements */
