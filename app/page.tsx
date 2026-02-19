@@ -36,6 +36,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import Link from "next/link";
 
 /* ─────────────────────── LOGO ─────────────────────── */
 const TrendMindLogo = ({ size = 28 }: { size?: number }) => (
@@ -413,12 +414,12 @@ export default function TrendMind() {
               </button>
 
               {/* Desktop Get Access Button with Arrow Icon */}
-              <a
-                href="#pricing"
+              <Link
+                href="/dashboard"
                 className="hidden md:inline-flex items-center gap-2 bg-[#2563EB] text-white rounded-full px-6 py-2.5 text-xs font-black uppercase border-[3px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all"
               >
                 Get Access <ArrowUpRight className="w-4 h-4" strokeWidth={3} />
-              </a>
+              </Link>
 
               {/* Mobile Menu Open Toggle */}
               <button
@@ -518,7 +519,7 @@ export default function TrendMind() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                href="#pricing"
+                href="/dashboard"
                 onClick={() => setMobileMenu(false)}
                 className="w-full flex items-center justify-center gap-2 py-5 rounded-[2rem] border-[3px] border-[#0A0A0A] dark:border-white/20 bg-[#2563EB] text-white font-black uppercase tracking-wider text-base shadow-[5px_5px_0px_0px_#0A0A0A] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.1)] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all mt-2"
               >
@@ -549,14 +550,14 @@ export default function TrendMind() {
           >
             {/* Top bar */}
             <div className="px-5 py-3.5 flex justify-between items-center border-b-[3px] border-[#0A0A0A] dark:border-white/15">
-              <a
+              <Link
                 href="#hero"
                 onClick={() => setMobileMenu(false)}
                 className="text-lg font-bold tracking-tight flex items-center gap-2 uppercase"
               >
                 <TrendMindLogo />
                 TrendMind
-              </a>
+              </Link>
               <button
                 className="p-2 rounded-xl border-[2px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10"
                 onClick={() => setMobileMenu(false)}
@@ -581,7 +582,7 @@ export default function TrendMind() {
                 </motion.a>
               ))}
               <motion.a
-                href="#pricing"
+                href="/dashboard"
                 onClick={() => setMobileMenu(false)}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -729,12 +730,12 @@ export default function TrendMind() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto z-10 relative"
           >
-            <a
-              href="#pricing"
+            <Link
+              href="/dashboard"
               className="bg-[#2563EB] text-white rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all flex items-center justify-center gap-2 tracking-wide"
             >
               Get Early Access <ArrowUpRight className="w-4 h-4" />
-            </a>
+            </Link>
             <button
               onClick={() => setShowDemo(true)}
               className="bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all flex items-center justify-center gap-2 tracking-wide hover:bg-[#FBBF24] dark:hover:bg-[#FBBF24] dark:hover:text-[#0A0A0A]"
@@ -1532,9 +1533,11 @@ export default function TrendMind() {
                       </li>
                     ))}
                   </ul>
-                  <button className="w-full bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white py-3.5 rounded-full text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all tracking-wide">
-                    Get Started
-                  </button>
+                  <Link href="/dashboard">
+                    <button className="w-full bg-white dark:bg-white/10 text-[#0A0A0A] dark:text-white py-3.5 rounded-full text-sm font-bold uppercase border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 cursor-pointer transition-all tracking-wide">
+                      Get Started
+                    </button>
+                  </Link>
                 </motion.div>
               </Reveal>
 
@@ -1595,9 +1598,11 @@ export default function TrendMind() {
                       </li>
                     ))}
                   </ul>
-                  <button className="w-full bg-[#FBBF24] text-[#0A0A0A] py-3.5 rounded-full text-sm font-bold uppercase border-[2px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all tracking-wide">
-                    Get Early Access
-                  </button>
+                  <Link href="/dashboard">
+                    <button className="w-full bg-[#FBBF24] text-[#0A0A0A] py-3.5 rounded-full text-sm font-bold uppercase border-[2px] border-[#0A0A0A] shadow-[3px_3px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all tracking-wide cursor-pointer">
+                      Get Early Access
+                    </button>
+                  </Link>
                 </motion.div>
               </Reveal>
             </div>
@@ -1754,12 +1759,12 @@ export default function TrendMind() {
               Join thousands of professionals already using TrendMind to grow
               their audience and influence.
             </p>
-            <a
-              href="#pricing"
+            <Link
+              href="/dashboard"
               className="inline-flex items-center gap-2 bg-[#0A0A0A] text-white rounded-full px-8 py-3.5 text-sm font-bold uppercase border-[2px] border-[#0A0A0A] shadow-[4px_4px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all relative z-10 tracking-wide"
             >
               Start Your Free Trial <ArrowUpRight className="w-4 h-4" />
-            </a>
+            </Link>
           </Reveal>
         </section>
       </main>
