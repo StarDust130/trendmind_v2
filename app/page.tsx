@@ -265,14 +265,7 @@ const ThemeToggle = () => {
   const isDark = resolvedTheme === "dark";
 
   const toggleTheme = () => {
-    // Enable smooth transition on all elements
-    document.documentElement.classList.add("theme-transition");
-    // Switch theme instantly
     setTheme(isDark ? "light" : "dark");
-    // Remove transition class after animation completes
-    setTimeout(() => {
-      document.documentElement.classList.remove("theme-transition");
-    }, 600);
   };
 
   return (
@@ -441,7 +434,7 @@ export default function TrendMind() {
         {/* Scroll progress bar */}
         {!mobileMenu && (
           <motion.div
-            className="h-[3px] bg-[#2563EB] dark:bg-[#3b82f6] origin-left relative z-50"
+            className="h-[3px] bg-[#2563EB] dark:bg-[#3b82f6] origin-left relative z-20"
             style={{ scaleX }}
           />
         )}
@@ -1950,7 +1943,7 @@ export default function TrendMind() {
               {/* Close button */}
               <button
                 onClick={() => setShowDemo(false)}
-                className="absolute -top-14 right-0 w-10 h-10 bg-white dark:bg-[#1A1A1A] text-[#0A0A0A] dark:text-white rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center hover:bg-[#FBBF24] transition-colors shadow-[3px_3px_0px_0px_#2563EB]"
+                className="absolute -top-14 right-0 w-10 h-10 bg-white dark:bg-[#1A1A1A] text-[#0A0A0A] dark:text-white rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 flex items-center justify-center hover:bg-[#FBBF24] transition-colors shadow-[3px_3px_0px_0px_#2563EB] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
