@@ -26,10 +26,6 @@ import {
   Users,
   TrendingUp,
   Shield,
-  Mail,
-  Linkedin,
-  Twitter,
-  Github,
   ChevronRight,
   Menu,
   XIcon,
@@ -38,7 +34,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
-
+import {
+  SiOpenai,
+  SiGooglegemini,
+  SiLinkedin,
+  SiX,
+  SiGithub,
+  SiGmail,
+} from "react-icons/si";
 /* ─────────────────────── LOGO ─────────────────────── */
 const TrendMindLogo = ({ size = 28 }: { size?: number }) => (
   <svg
@@ -1854,32 +1857,55 @@ export default function TrendMind() {
                 Craft high-performing posts with AI-powered strategy and
                 dominate your industry on LinkedIn.
               </p>
-              {/* Social links */}
-              <div className="flex gap-2.5">
+              <div className="flex gap-4">
                 {[
                   {
-                    icon: <Linkedin className="w-4 h-4" />,
-                    bg: "hover:bg-[#2563EB]",
+                    icon: <SiLinkedin />,
+                    url: "https://linkedin.com",
+                    color:
+                      "group-hover:text-[#0A66C2] group-hover:border-[#0A66C2]/50 group-hover:shadow-[0_0_15px_rgba(10,102,194,0.3)]",
                   },
                   {
-                    icon: <Twitter className="w-4 h-4" />,
-                    bg: "hover:bg-[#1DA1F2]",
+                    icon: <SiX />, // New X (Twitter) Brand Icon
+                    url: "https://x.com",
+                    color:
+                      "group-hover:text-white group-hover:border-white/50 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]",
                   },
                   {
-                    icon: <Github className="w-4 h-4" />,
-                    bg: "hover:bg-white/20",
+                    icon: <SiGithub />,
+                    url: "https://github.com",
+                    color:
+                      "group-hover:text-white group-hover:border-white/50 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]",
                   },
                   {
-                    icon: <Mail className="w-4 h-4" />,
-                    bg: "hover:bg-[#E64833]",
+                    icon: <SiGmail />,
+                    url: "mailto:hello@trendmind.ai",
+                    color:
+                      "group-hover:text-[#EA4335] group-hover:border-[#EA4335]/50 group-hover:shadow-[0_0_15px_rgba(234,67,53,0.3)]",
                   },
                 ].map((social, i) => (
                   <a
                     key={i}
-                    href="#"
-                    className={`w-9 h-9 rounded-lg border-[2px] border-white/20 flex items-center justify-center ${social.bg} hover:border-transparent transition-all`}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`
+        group relative w-10 h-10 
+        flex items-center justify-center 
+        rounded-xl border-[1.5px] border-white/10 
+        bg-white/[0.02] backdrop-blur-sm
+        transition-all duration-300 ease-out
+        ${social.color}
+        hover:-translate-y-1
+      `}
                   >
-                    {social.icon}
+                    {/* Icon */}
+                    <span className="text-white/30 text-lg transition-colors duration-300 group-hover:text-inherit">
+                      {social.icon}
+                    </span>
+
+                    {/* Background Flare - Subtle radial gradient on hover */}
+                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] transition-opacity" />
                   </a>
                 ))}
               </div>
@@ -1936,18 +1962,52 @@ export default function TrendMind() {
             </div>
 
             {/* Powered by — full width on mobile, 3 cols on md */}
-            <div className="col-span-2 md:col-span-3">
-              <h4 className="font-bold uppercase mb-4 text-xs tracking-wider text-[#FBBF24]">
+            <div className="col-span-2 md:col-span-3 mt-12">
+              {/* Tactical Heading */}
+              <h4 className="font-black uppercase mb-8 text-[10px] tracking-[0.4em] text-[#FBBF24] flex items-center gap-3">
+                <span className="w-1.5 h-1.5 bg-[#FBBF24] rounded-full animate-pulse" />
                 Powered By
               </h4>
-              <div className="flex flex-wrap gap-2">
-                {["OpenAI", "Gemini AI", "LinkedIn API"].map((tech) => (
-                  <span
-                    key={tech}
-                    className="px-3 py-1.5 rounded-lg border-[2px] border-white/15 text-[10px] font-bold uppercase tracking-wider text-white/60"
+
+              {/* Raw Icon Dock */}
+              <div className="flex items-center gap-12 ml-1">
+                {[
+                  {
+                    name: "OpenAI",
+                    icon: <SiOpenai />,
+                    url: "https://openai.com",
+                    hoverColor:
+                      "group-hover:text-[#10a37f] group-hover:drop-shadow-[0_0_15px_rgba(16,163,127,0.8)]",
+                  },
+                  {
+                    name: "Gemini",
+                    icon: <SiGooglegemini />,
+                    url: "https://gemini.google.com",
+                    hoverColor:
+                      "group-hover:text-[#4285F4] group-hover:drop-shadow-[0_0_15px_rgba(66,133,244,0.8)]",
+                  },
+                  {
+                    name: "LinkedIn",
+                    icon: <SiLinkedin />,
+                    url: "https://developer.linkedin.com",
+                    hoverColor:
+                      "group-hover:text-[#0A66C2] group-hover:drop-shadow-[0_0_15px_rgba(10,102,194,0.8)]",
+                  },
+                ].map((tech) => (
+                  <Link
+                    key={tech.name}
+                    href={tech.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex items-center justify-center transition-all duration-300"
                   >
-                    {tech}
-                  </span>
+                    {/* The Icon - Deep Dimmed when inactive, Neon when hovered */}
+                    <span
+                      className={`text-[26px] text-white/10 transition-all duration-500 group-hover:scale-110 ${tech.hoverColor}`}
+                    >
+                      {tech.icon}
+                    </span>
+                  </Link>
                 ))}
               </div>
             </div>
