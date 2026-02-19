@@ -1,30 +1,38 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-// 1. Establish the explicit whitelist of public routes.
-// The (.*) regex ensures any sub-routes (like /help/contact) are also permitted.
+// 1. Whitelist of public routes
 const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/help(.*)",
   "/legal(.*)",
-  "/terms(.*)",
-  "/privacy(.*)",
-  "/api/webhooks(.*)", // CRITICAL: Always whitelist webhooks if you use Stripe/Clerk syncing
+  "/api/webhooks(.*)",
 ]);
 
+// 2. Specific check for Auth pages (to prevent logged-in users from seeing them)
+const isAuthRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
+
 export default clerkMiddleware(async (auth, req) => {
-  // 2. Intercept the request. If it does NOT match the public whitelist, enforce login.
+  const { userId } = await auth();
+
+  // Redirect authenticated users away from sign-in/sign-up to dashboard
+  if (userId && isAuthRoute(req)) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  // Enforce login for everything else that isn't public
   if (!isPublicRoute(req)) {
     await auth.protect();
   }
+
+  return NextResponse.next();
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };
