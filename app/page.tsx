@@ -43,6 +43,7 @@ import {
   SiGmail,
 } from "react-icons/si";
 import { TrendMindLogo } from "@/components/elements/TrendMindLogo";
+import { ThemeToggle } from "@/components/elements/ThemeToggle";
 
 
 /* ─────────── FLOATING BAUHAUS SHAPES ─────────── */
@@ -240,102 +241,7 @@ const marqueePosts = [
   ...baseMarqueePosts,
 ];
 
-/* ─────────── THEME TOGGLE ─────────── */
-const ThemeToggle = () => {
-  const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
 
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) {
-    return (
-      <div className="w-9 h-9 rounded-full border-[2px] border-[#0A0A0A] dark:border-white/20 bg-white dark:bg-white/10" />
-    );
-  }
-
-  const isDark = resolvedTheme === "dark";
-
-  const toggleTheme = () => {
-    setTheme(isDark ? "light" : "dark");
-  };
-
-  return (
-    <div
-      className="relative flex items-center justify-center"
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      {/* Tooltip (Hidden on Mobile) */}
-      <AnimatePresence>
-        {showTooltip && (
-          <motion.div
-            initial={{ opacity: 0, y: 4, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="hidden md:block absolute top-full mt-2.5 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-[#0A0A0A] dark:bg-white text-white dark:text-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider whitespace-nowrap pointer-events-none z-999 border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[2px_2px_0px_0px_#2563EB]"
-          >
-            {isDark ? "Light Mode (Be prepared) 🫣" : "Dark Mode"}
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0A0A0A] dark:bg-white rotate-45 border-l-[2px] border-t-[2px] border-[#0A0A0A] dark:border-white/20" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Button */}
-      <motion.button
-        onClick={() => {
-          toggleTheme();
-          setShowTooltip(false);
-        }}
-        className="relative w-9 h-9 cursor-pointer rounded-full border-[2px] border-[#0A0A0A] dark:border-white/25 bg-white dark:bg-white/10 flex items-center justify-center shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.08)] hover:shadow-none hover:translate-y-0.5 hover:translate-x-0.5 transition-all overflow-hidden group"
-        whileTap={{ scale: 0.85 }}
-        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      >
-        <div className="relative w-full h-full flex items-center justify-center">
-          {/* SUN - Always in DOM, animated via GPU */}
-          <motion.div
-            initial={false}
-            animate={{
-              opacity: isDark ? 1 : 0,
-              rotate: isDark ? 0 : -180,
-              scale: isDark ? 1 : 0.5,
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <Sun className="w-4 h-4 text-[#FBBF24]" strokeWidth={2.5} />
-          </motion.div>
-
-          {/* MOON - Always in DOM, animated via GPU */}
-          <motion.div
-            initial={false}
-            animate={{
-              opacity: isDark ? 0 : 1,
-              rotate: isDark ? 180 : 0,
-              scale: isDark ? 0.5 : 1,
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <Moon className="w-4 h-4 text-[#2563EB]" strokeWidth={2.5} />
-          </motion.div>
-        </div>
-
-        {/* Glow ring on hover */}
-        <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <div
-            className={`absolute inset-0 rounded-full transition-colors duration-300 ${
-              isDark
-                ? "shadow-[0_0_14px_#FBBF24,inset_0_0_8px_rgba(251,191,36,0.25)]"
-                : "shadow-[0_0_14px_#2563EB,inset_0_0_8px_rgba(37,99,235,0.2)]"
-            }`}
-          />
-        </div>
-      </motion.button>
-    </div>
-  );
-};
 
 /* ═══════════════════════════════════════════════════
    MAIN COMPONENT
