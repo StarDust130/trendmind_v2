@@ -14,6 +14,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
+import { TrendMindLogo } from "./TrendMindLogo";
 // import ThemeToggle from "@/components/ThemeToggle"; // Insert ThemeToggle here
 
 export function Header({ setIsMobileOpen }: any) {
@@ -167,7 +168,7 @@ export function Header({ setIsMobileOpen }: any) {
                       My Profile
                     </Link>
                     <Link
-                      href="/billing"
+                      href="/pricing"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#0A0A0A]/5 dark:hover:bg-white/5 font-bold text-xs uppercase tracking-widest text-[#0A0A0A] dark:text-white transition-colors"
                     >
@@ -177,6 +178,15 @@ export function Header({ setIsMobileOpen }: any) {
                         className="text-[#FBBF24]"
                       />{" "}
                       Billing
+                    </Link>
+
+                    <Link
+                      href="/"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#0A0A0A]/5 dark:hover:bg-white/5 font-bold text-xs uppercase tracking-widest text-[#0A0A0A] dark:text-white transition-colors"
+                    >
+                     <TrendMindLogo />
+                      Home Page
                     </Link>
                   </div>
 
