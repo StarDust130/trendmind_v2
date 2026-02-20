@@ -1,6 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Target,
@@ -9,6 +10,7 @@ import {
   Rocket,
   ArrowRight,
   Zap,
+  Plus,
 } from "lucide-react";
 
 const containerVariants = {
@@ -27,6 +29,7 @@ const itemVariants = {
 
 export default function DashboardEmptyState() {
   const { user, isLoaded } = useUser();
+  const router = useRouter();
 
   const workflowSteps = [
     {
@@ -36,7 +39,7 @@ export default function DashboardEmptyState() {
       desc: "Define your audience and set aggressive growth goals.",
       bg: "bg-[#2563EB]/10",
       border: "border-[#2563EB]/30",
-      glow: "hover:shadow-[0_0_30px_rgba(37,99,235,0.15)]",
+      shadowFocus: "hover:shadow-[4px_4px_0px_0px_#2563EB]",
     },
     {
       id: 2,
@@ -45,7 +48,7 @@ export default function DashboardEmptyState() {
       desc: "TrendMind constructs a data-backed content matrix.",
       bg: "bg-[#9333EA]/10",
       border: "border-[#9333EA]/30",
-      glow: "hover:shadow-[0_0_30px_rgba(147,51,234,0.15)]",
+      shadowFocus: "hover:shadow-[4px_4px_0px_0px_#9333EA]",
     },
     {
       id: 3,
@@ -56,7 +59,7 @@ export default function DashboardEmptyState() {
       desc: "Automate delivery for maximum algorithmic impact.",
       bg: "bg-[#10B981]/10",
       border: "border-[#10B981]/30",
-      glow: "hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]",
+      shadowFocus: "hover:shadow-[4px_4px_0px_0px_#10B981]",
     },
     {
       id: 4,
@@ -65,13 +68,13 @@ export default function DashboardEmptyState() {
       desc: "Approve the drafts and dominate your feed.",
       bg: "bg-[#E64833]/10",
       border: "border-[#E64833]/30",
-      glow: "hover:shadow-[0_0_30px_rgba(230,72,51,0.15)]",
+      shadowFocus: "hover:shadow-[4px_4px_0px_0px_#E64833]",
     },
   ];
 
   return (
-    // FIXED: Changed max-w-6xl to max-w-[1600px] to allow the grid to stretch out
     <div className="w-full max-w-[1600px] mx-auto flex flex-col pt-2 pb-12">
+      {/* ─── HEADER ─── */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -89,6 +92,7 @@ export default function DashboardEmptyState() {
         </p>
       </motion.div>
 
+      {/* ─── PROTOCOL GRID ─── */}
       <div className="mb-16">
         <div className="flex items-center gap-3 mb-6 justify-center md:justify-start">
           <div className="w-2 h-2 rounded-full bg-[#2563EB] animate-pulse" />
@@ -104,14 +108,15 @@ export default function DashboardEmptyState() {
           className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6 relative"
         >
           {workflowSteps.map((step) => (
-            <motion.div
+            <motion.button
               key={step.id}
+              onClick={() => router.push("/strategy")}
               variants={itemVariants}
-              whileHover={{ y: -5, scale: 1.01 }}
-              // FIXED: Upgraded aesthetics. Uses bg-gradient, thinner borders on dark mode, and dynamic glow.
-              className={`relative z-10 bg-[#FAFAFA] dark:bg-gradient-to-b dark:from-[#111] dark:to-[#0A0A0A] border-[2px] sm:border-[3px] border-[#0A0A0A] dark:border-white/5 rounded-2xl p-5 lg:p-6 transition-all duration-300 flex flex-col gap-4 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-none ${step.glow}`}
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className={`relative z-10 w-full text-left bg-[#FAFAFA] dark:bg-gradient-to-b dark:from-[#111] dark:to-[#0A0A0A] border-[3px] border-[#0A0A0A] dark:border-white/10 rounded-2xl p-5 lg:p-6 transition-all duration-300 flex flex-col gap-4 shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-none ${step.shadowFocus}`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between w-full">
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center border-[2px] ${step.bg} ${step.border}`}
                 >
@@ -122,24 +127,27 @@ export default function DashboardEmptyState() {
                 </span>
               </div>
               <div>
-                <h4 className="font-black uppercase text-sm tracking-wide text-[#0A0A0A] dark:text-white mb-1.5">
+                <h4 className="font-black uppercase text-sm tracking-wide text-[#0A0A0A] dark:text-white mb-1.5 flex items-center justify-between">
                   {step.title}
+                  <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </h4>
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 leading-relaxed">
                   {step.desc}
                 </p>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
         </motion.div>
       </div>
 
+      {/* ─── MASSIVE CTA ─── */}
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5, type: "spring", stiffness: 200, damping: 20 }}
         className="relative w-full bg-[#0A0A0A] dark:bg-gradient-to-br dark:from-[#111] dark:to-[#050505] border-[3px] lg:border-[4px] border-[#0A0A0A] dark:border-white/10 rounded-[2rem] p-8 md:p-14 overflow-hidden shadow-[8px_8px_0px_0px_#2563EB] dark:shadow-[0_0_40px_rgba(37,99,235,0.15)]"
       >
+        {/* Background Effects */}
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#2563EB]/15 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
         <div
           className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03]"
@@ -163,7 +171,11 @@ export default function DashboardEmptyState() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <button className="w-full sm:w-auto group relative flex items-center justify-center gap-3 bg-[#FBBF24] text-[#0A0A0A] px-8 py-4 rounded-xl border-[3px] border-[#0A0A0A] font-black uppercase text-sm tracking-widest shadow-[4px_4px_0px_0px_#0A0A0A] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all active:bg-[#f5b316]">
+            {/* Primary Action -> Routes to /strategy */}
+            <button
+              onClick={() => router.push("/strategy")}
+              className="w-full sm:w-auto group relative flex items-center justify-center gap-3 bg-[#FBBF24] text-[#0A0A0A] px-8 py-4 rounded-xl border-[3px] border-[#0A0A0A] font-black uppercase text-sm tracking-widest shadow-[4px_4px_0px_0px_#0A0A0A] cursor-pointer hover:shadow-none hover:translate-y-[4px] hover:translate-x-[4px] transition-all active:bg-[#f5b316]"
+            >
               Create Strategy
               <ArrowRight
                 className="w-5 h-5 group-hover:translate-x-1 transition-transform"
@@ -175,7 +187,15 @@ export default function DashboardEmptyState() {
               OR
             </span>
 
-            <button className="w-full sm:w-auto group flex items-center justify-center gap-2 bg-transparent text-white px-8 py-4 rounded-xl border-[3px] border-white/20 font-black uppercase text-sm tracking-widest hover:border-white/50 hover:bg-white/5 transition-all">
+            {/* Secondary Action -> Routes to /generate */}
+            <button
+              onClick={() => router.push("/generate")}
+              className="w-full sm:w-auto group flex items-center justify-center gap-2 bg-[#111] text-white px-8 py-4 rounded-xl border-[3px] border-white/20 font-black uppercase text-sm tracking-widest hover:border-white/50 hover:bg-white/5 transition-all cursor-pointer"
+            >
+              <Plus
+                className="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity"
+                strokeWidth={3}
+              />
               Quick Post
             </button>
           </div>
