@@ -108,6 +108,22 @@ const features = [
 export default function SignUpPage() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
+  const [pendingStrategy, setPendingStrategy] = useState<string | null>(null);
+
+  const handleOAuth = async (strategy: "oauth_apple" | "oauth_google" | "oauth_linkedin_oidc") => {
+    if (!isLoaded) return;
+    setPendingStrategy(strategy); // Set the specific loader
+    try {
+      await signUp.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/dashboard",
+      });
+    } catch (err) {
+      setPendingStrategy(null); // Reset only on error
+      console.error(err);
+    }
+  };
 
   const [username, setUsername] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
@@ -116,16 +132,7 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleOAuth = (
-    strategy: "oauth_google" | "oauth_apple" | "oauth_linkedin_oidc",
-  ) => {
-    if (!isLoaded) return;
-    signUp.authenticateWithRedirect({
-      strategy,
-      redirectUrl: "/sso-callback",
-      redirectUrlComplete: "/dashboard",
-    });
-  };
+;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,42 +329,59 @@ export default function SignUpPage() {
             </div>
 
             {/* OAuth Buttons */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-3 gap-3 mb-6 ">
               {[
                 {
+                  strategy: "oauth_apple",
                   icon: (
-                    <SiApple className="w-[18px] h-[18px] dark:text-white" />
+                    <SiApple className="w-[18px] h-[18px] cursor-pointer dark:text-white" />
                   ),
                   label: "Apple",
-                  fn: () => handleOAuth("oauth_apple"),
                 },
                 {
-                  icon: <FcGoogle className="w-[18px] h-[18px]" />,
-                  label: "Google",
-                  fn: () => handleOAuth("oauth_google"),
-                },
-                {
+                  strategy: "oauth_google",
                   icon: (
-                    <SiLinkedin className="w-[18px] h-[18px] text-[#0A66C2]" />
+                    <FcGoogle className="w-[18px] h-[18px] cursor-pointer" />
+                  ),
+                  label: "Google",
+                },
+                {
+                  strategy: "oauth_linkedin_oidc",
+                  icon: (
+                    <SiLinkedin className="w-[18px] h-[18px] text-[#0A66C2] cursor-pointer" />
                   ),
                   label: "LinkedIn",
-                  fn: () => handleOAuth("oauth_linkedin_oidc"),
                 },
-              ].map((btn) => (
-                <motion.button
-                  key={btn.label}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={btn.fn}
-                  type="button"
-                  className="h-12 flex flex-col items-center justify-center gap-1 bg-[#F5F5F5] dark:bg-white/[0.05] border-[2px] border-[#0A0A0A]/10 dark:border-white/10 rounded-xl hover:border-[#0A0A0A]/40 dark:hover:border-white/30 hover:shadow-[3px_3px_0px_0px_#0A0A0A] dark:hover:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] transition-all"
-                >
-                  {btn.icon}
-                  <span className="text-[8px] font-black uppercase tracking-wider opacity-40">
-                    {btn.label}
-                  </span>
-                </motion.button>
-              ))}
+              ].map((btn) => {
+                const isThisLoading = pendingStrategy === btn.strategy;
+
+                return (
+                  <motion.button
+                    key={btn.label}
+                    disabled={!!pendingStrategy} // Disable all when one is clicked
+                    whileHover={!pendingStrategy ? { y: -2 } : {}}
+                    whileTap={!pendingStrategy ? { scale: 0.97 } : {}}
+                    onClick={() => handleOAuth(btn.strategy)}
+                    type="button"
+                    className={`h-12 flex flex-col items-center justify-center gap-1 bg-[#F5F5F5] dark:bg-white/[0.05] border-[2px] rounded-xl transition-all ${
+                      isThisLoading
+                        ? "border-[#2563EB] shadow-none"
+                        : "border-[#0A0A0A]/10 dark:border-white/10 hover:border-[#0A0A0A]/40 dark:hover:border-white/30 hover:shadow-[3px_3px_0px_0px_#0A0A0A]"
+                    } disabled:opacity-70`}
+                  >
+                    {isThisLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-[#2563EB]" />
+                    ) : (
+                      <>
+                        {btn.icon}
+                        <span className="text-[8px] font-black uppercase tracking-wider opacity-40">
+                          {btn.label}
+                        </span>
+                      </>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
 
             {/* Divider */}
