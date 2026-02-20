@@ -58,7 +58,7 @@ export function Header({ setIsMobileOpen }: any) {
           <motion.button
             onClick={() => setBellOpen(!bellOpen)}
             whileHover="hover"
-            className="relative w-11 h-11 flex items-center justify-center bg-white dark:bg-[#111] border-[3px] border-[#0A0A0A] dark:border-white/20 rounded-xl hover:-translate-y-1 hover:shadow-[3px_3px_0px_0px_#0A0A0A] dark:hover:shadow-[3px_3px_0px_0px_#E64833] transition-all"
+            className="relative w-11 h-11 flex items-center justify-center bg-white dark:bg-[#111] border-[3px] border-[#0A0A0A] dark:border-white/20 rounded-xl hover:-translate-y-1 hover:shadow-[3px_3px_0px_0px_#0A0A0A] dark:hover:shadow-[3px_3px_0px_0px_#E64833] transition-all cursor-pointer"
           >
             {/* Physics-based Pendulum Swing */}
             <motion.div
@@ -78,14 +78,14 @@ export function Header({ setIsMobileOpen }: any) {
             </motion.div>
 
             {/* Notification Badge */}
-            <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-[#E64833] border-[2px] border-[#FAFAFA] dark:border-[#050505] rounded-lg" />
+            <span className="absolute cursor-pointer -top-1.5 -right-1.5 w-3.5 h-3.5 bg-[#E64833] border-[2px] border-[#FAFAFA] dark:border-[#050505] rounded-lg" />
           </motion.button>
 
           <AnimatePresence>
             {bellOpen && (
               <>
                 <div
-                  className="fixed inset-0 z-40"
+                  className="fixed inset-0 z-40 "
                   onClick={() => setBellOpen(false)}
                 />
                 <motion.div
@@ -113,10 +113,10 @@ export function Header({ setIsMobileOpen }: any) {
         </div>
 
         {/* ─── PURE AVATAR BLOCK ─── */}
-        <div className="relative">
+        <div className="relative cursor-pointer">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-11 h-11 flex items-center justify-center bg-white dark:bg-[#111] border-[3px] border-[#0A0A0A] dark:border-white/20 rounded-xl hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_#0A0A0A] dark:hover:shadow-[4px_4px_0px_0px_#2563EB] transition-all overflow-hidden"
+            className="w-11 h-11 flex items-center justify-center bg-white dark:bg-[#111] border-[3px] border-[#0A0A0A] dark:border-white/20 rounded-xl hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_#0A0A0A] dark:hover:shadow-[4px_4px_0px_0px_#2563EB] cursor-pointer transition-all overflow-hidden"
             title="Account Menu"
           >
             {isLoaded && user ? (
@@ -156,7 +156,7 @@ export function Header({ setIsMobileOpen }: any) {
 
                   <div className="p-2 flex flex-col gap-1">
                     <Link
-                      href="/profile"
+                      href="/settings"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#0A0A0A]/5 dark:hover:bg-white/5 font-bold text-xs uppercase tracking-widest text-[#0A0A0A] dark:text-white transition-colors"
                     >
@@ -185,7 +185,7 @@ export function Header({ setIsMobileOpen }: any) {
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#0A0A0A]/5 dark:hover:bg-white/5 font-bold text-xs uppercase tracking-widest text-[#0A0A0A] dark:text-white transition-colors"
                     >
-                     <TrendMindLogo />
+                      <TrendMindLogo />
                       Home Page
                     </Link>
                   </div>
