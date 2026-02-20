@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Target,
   Bot,
@@ -11,8 +12,13 @@ import {
   ArrowRight,
   Zap,
   Plus,
+  Calendar as CalendarIcon,
+  Clock,
+  FileText,
+  TerminalSquare,
 } from "lucide-react";
 
+// ─── ANIMATION ORCHESTRATION ───
 const containerVariants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.12 } },
@@ -30,6 +36,29 @@ const itemVariants = {
 export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+
+  // ─── LOCAL STORAGE PIPELINE STATE ───
+  const [scheduledPosts, setScheduledPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Intercept data from the generation/calendar loop
+    const storedData = localStorage.getItem("trendmind_posts");
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData);
+        // Mathematically sort them so the soonest posts appear first
+        const sorted = parsed.sort((a: any, b: any) => {
+          return (
+            new Date(`${a.date}T${a.time}`).getTime() -
+            new Date(`${b.date}T${b.time}`).getTime()
+          );
+        });
+        setScheduledPosts(sorted);
+      } catch (error) {
+        console.error("Failed to parse local posts", error);
+      }
+    }
+  }, []);
 
   const workflowSteps = [
     {
@@ -73,13 +102,13 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto flex flex-col pt-2 pb-12">
+    <div className="w-full max-w-[1600px] mx-auto flex flex-col pt-2 pb-12 overflow-x-hidden">
       {/* ─── HEADER ─── */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="mb-14 text-center md:text-left"
+        className="mb-12 text-center md:text-left"
       >
         <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-[#0A0A0A] dark:text-white leading-[1.1]">
           Welcome, <br className="md:hidden" />
@@ -92,12 +121,78 @@ export default function DashboardPage() {
         </p>
       </motion.div>
 
+      {/* ─── ACTIVE PIPELINE (Dynamically mounts if posts exist) ─── */}
+      <AnimatePresence>
+        {scheduledPosts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mb-16"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[#0A0A0A] dark:text-white">
+                  Active Payload Pipeline
+                </h3>
+              </div>
+              <button
+                onClick={() => router.push("/calendar")}
+                className="text-[10px] font-black uppercase tracking-widest text-[#2563EB] hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
+              >
+                View Full Calendar <ArrowRight size={12} strokeWidth={3} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
+              {scheduledPosts.slice(0, 3).map((post) => (
+                <div
+                  key={post.id}
+                  onClick={() => router.push("/calendar")}
+                  className="group cursor-pointer flex flex-col bg-white dark:bg-[#111] border-[3px] border-[#0A0A0A] dark:border-white/10 rounded-2xl overflow-hidden shadow-[5px_5px_0px_0px_#0A0A0A] dark:shadow-none hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#10B981] dark:hover:border-[#10B981] transition-all duration-300"
+                >
+                  <div className="bg-[#FAFAFA] dark:bg-[#050505] border-b-[3px] border-[#0A0A0A] dark:border-white/10 p-3.5 flex items-center justify-between shrink-0">
+                    <span className="px-2.5 py-1 bg-[#10B981]/10 text-[#10B981] border-[2px] border-[#10B981]/30 rounded-md text-[9px] font-black uppercase tracking-widest">
+                      {post.type}
+                    </span>
+                    <TerminalSquare
+                      size={14}
+                      className="text-slate-400 group-hover:text-[#10B981] transition-colors"
+                    />
+                  </div>
+
+                  <div className="p-5 flex-1 flex flex-col">
+                    <h4 className="font-black text-sm text-[#0A0A0A] dark:text-white uppercase tracking-tight mb-2 line-clamp-1">
+                      {post.title}
+                    </h4>
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed mb-4 flex-1">
+                      {post.content || "No preview available..."}
+                    </p>
+
+                    <div className="flex items-center gap-4 pt-4 border-t-[2px] border-[#0A0A0A]/5 dark:border-white/5 mt-auto">
+                      <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-[#0A0A0A] dark:group-hover:text-white transition-colors">
+                        <CalendarIcon size={12} strokeWidth={2.5} />
+                        {post.date}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-[#0A0A0A] dark:group-hover:text-white transition-colors">
+                        <Clock size={12} strokeWidth={2.5} />
+                        {post.time}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ─── PROTOCOL GRID ─── */}
       <div className="mb-16">
         <div className="flex items-center gap-3 mb-6 justify-center md:justify-start">
-          <div className="w-2 h-2 rounded-full bg-[#2563EB] animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-[#2563EB]" />
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0A0A0A] dark:text-white opacity-60">
-            The TrendMind Protocol
+            System Architecture
           </h3>
         </div>
 
@@ -147,7 +242,6 @@ export default function DashboardPage() {
         transition={{ delay: 0.5, type: "spring", stiffness: 200, damping: 20 }}
         className="relative w-full bg-[#0A0A0A] dark:bg-gradient-to-br dark:from-[#111] dark:to-[#050505] border-[3px] lg:border-[4px] border-[#0A0A0A] dark:border-white/10 rounded-[2rem] p-8 md:p-14 overflow-hidden shadow-[8px_8px_0px_0px_#2563EB] dark:shadow-[0_0_40px_rgba(37,99,235,0.15)]"
       >
-        {/* Background Effects */}
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#2563EB]/15 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
         <div
           className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03]"
@@ -171,7 +265,6 @@ export default function DashboardPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            {/* Primary Action -> Routes to /strategy */}
             <button
               onClick={() => router.push("/strategy")}
               className="w-full sm:w-auto group relative flex items-center justify-center gap-3 bg-[#FBBF24] text-[#0A0A0A] px-8 py-4 rounded-xl border-[3px] border-[#0A0A0A] font-black uppercase text-sm tracking-widest shadow-[4px_4px_0px_0px_#0A0A0A] cursor-pointer hover:shadow-none hover:translate-y-[4px] hover:translate-x-[4px] transition-all active:bg-[#f5b316]"
@@ -187,7 +280,6 @@ export default function DashboardPage() {
               OR
             </span>
 
-            {/* Secondary Action -> Routes to /generate */}
             <button
               onClick={() => router.push("/generate")}
               className="w-full sm:w-auto group flex items-center justify-center gap-2 bg-[#111] text-white px-8 py-4 rounded-xl border-[3px] border-white/20 font-black uppercase text-sm tracking-widest hover:border-white/50 hover:bg-white/5 transition-all cursor-pointer"
