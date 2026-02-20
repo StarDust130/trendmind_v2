@@ -364,7 +364,7 @@ export default function CustomSignIn() {
                   className="h-12 flex flex-col items-center justify-center gap-1 bg-[#F5F5F5] dark:bg-white/[0.05] border-[2px] border-[#0A0A0A]/10 dark:border-white/10 rounded-xl hover:border-[#0A0A0A]/40 dark:hover:border-white/30 hover:shadow-[3px_3px_0px_0px_#0A0A0A] dark:hover:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.1)] transition-all"
                 >
                   {btn.icon}
-                  <span className="text-[8px] font-black uppercase tracking-wider opacity-40">
+                  <span className="text-[8px] font-black uppercase tracking-wider opacity-140">
                     {btn.label}
                   </span>
                 </motion.button>
@@ -374,7 +374,7 @@ export default function CustomSignIn() {
             {/* Divider */}
             <div className="relative flex items-center mb-6">
               <div className="flex-grow border-t-[2px] border-[#0A0A0A]/10 dark:border-white/10" />
-              <span className="mx-3 text-[9px] font-black uppercase tracking-widest opacity-30 whitespace-nowrap">
+              <span className="mx-3 text-[9px] font-black uppercase tracking-widest opacity-140 whitespace-nowrap">
                 or with email
               </span>
               <div className="flex-grow border-t-[2px] border-[#0A0A0A]/10 dark:border-white/10" />
@@ -401,7 +401,7 @@ export default function CustomSignIn() {
 
               {/* Email */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest opacity-50">
+                <label className="text-[10px] font-black uppercase tracking-widest opacity-140">
                   Email
                 </label>
                 <div className="relative group">
@@ -413,7 +413,7 @@ export default function CustomSignIn() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3.5 rounded-xl border-[2px] border-[#0A0A0A]/12 dark:border-white/10 bg-[#F7F7F7] dark:bg-white/[0.04] font-semibold text-sm focus:border-[#2563EB] focus:shadow-[3px_3px_0px_0px_#2563EB] outline-none transition-all placeholder:opacity-35 placeholder:text-xs"
+                    className="w-full pl-10 pr-4 py-3.5 rounded-xl border-[2px] border-[#0A0A0A]/12 dark:border-white/10 bg-[#F7F7F7] dark:bg-white/[0.04] font-semibold text-sm focus:border-[#2563EB] focus:shadow-[3px_3px_0px_0px_rgb(37, 99, 235)] outline-none transition-all placeholder:opacity-135 placeholder:text-xs"
                     placeholder="name@domain.com"
                     required
                     autoComplete="email"
@@ -424,7 +424,7 @@ export default function CustomSignIn() {
               {/* Password */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-black uppercase tracking-widest opacity-50">
+                  <label className="text-[10px] font-black uppercase tracking-widest opacity-150">
                     Password
                   </label>
                   <Link
@@ -482,7 +482,7 @@ export default function CustomSignIn() {
             </form>
 
             {/* Footer */}
-            <p className="mt-6 text-center text-[10px] font-black uppercase tracking-wider opacity-40">
+            <p className="mt-6 text-center text-[10px] font-black uppercase tracking-wider opacity-140">
               No account?{" "}
               <Link
                 href="/sign-up"

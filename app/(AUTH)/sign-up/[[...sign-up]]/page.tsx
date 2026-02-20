@@ -22,22 +22,9 @@ import {
 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { SiApple, SiLinkedin } from "react-icons/si";
+import { TrendMindLogo } from "@/components/elements/TrendMindLogo";
 
-/* ─── Logo ─── */
-const TrendMindLogo = ({ size = 32 }: { size?: number }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="white"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0" />
-  </svg>
-);
+
 
 /* ─── Form Logo (adapts to theme) ─── */
 const FormLogo = ({ size = 26 }: { size?: number }) => (
@@ -161,7 +148,7 @@ export default function SignUpPage() {
       {/* ═══ BACK BUTTON ═══ */}
       <Link
         href="/"
-        className="fixed top-6 left-6 z-50 flex items-center justify-center w-11 h-11 bg-white dark:bg-[#111] border-[3px] border-[#0A0A0A] dark:border-white/20 rounded-xl shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_#FBBF24] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all group"
+        className="absolute top-6 left-6 z-50 flex items-center justify-center w-11 h-11 bg-white dark:bg-[#111] border-[3px] border-[#0A0A0A] dark:border-white/20 rounded-xl shadow-[4px_4px_0px_0px_#0A0A0A] dark:shadow-[4px_4px_0px_0px_#FBBF24] hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all group"
         aria-label="Back to home"
       >
         <ArrowLeft
@@ -204,10 +191,10 @@ export default function SignUpPage() {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="relative z-10 flex items-center gap-3"
+          className="relative z-10 flex  items-center gap-3"
         >
-          <div className="p-2 bg-white/5 border border-white/10 rounded-lg backdrop-blur-md">
-            <TrendMindLogo size={24} color="#2563EB" />
+          <div className="p-2 bg-white/5 ml-5  rounded-lg backdrop-blur-md">
+            <TrendMindLogo size={24} />
           </div>
           <span className="text-white text-xl font-black uppercase tracking-[0.2em]">
             TrendMind <span className="text-[#2563EB]">.</span>
@@ -314,7 +301,7 @@ export default function SignUpPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex items-center gap-2 mb-7 lg:hidden"
+            className="flex items-center justify-center gap-2 mb-7 lg:hidden"
           >
             <FormLogo size={26} />
             <span className="font-black text-lg uppercase tracking-tight">
@@ -405,7 +392,7 @@ export default function SignUpPage() {
               <FieldGroup
                 icon={<User className="w-4 h-4" strokeWidth={2.5} />}
                 label="Full Name"
-                placeholder="Thor Yadav"
+                placeholder="Thor"
                 value={username}
                 onChange={setUsername}
                 autoComplete="name"
@@ -442,7 +429,7 @@ export default function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 opacity-30 hover:opacity-70 transition-opacity"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 opacity-130 hover:opacity-170 transition-opacity"
                     tabIndex={-1}
                   >
                     {showPassword ? (
@@ -472,18 +459,18 @@ export default function SignUpPage() {
               </motion.button>
 
               {/* Fine print */}
-              <p className="text-[9px] font-medium text-center opacity-30 leading-relaxed px-2">
+              <p className="text-[9px] font-medium text-center opacity-130 leading-relaxed px-2">
                 By creating an account you agree to our Terms of Service and
                 Privacy Policy.
               </p>
             </form>
 
             {/* Footer */}
-            <p className="mt-5 text-center text-[10px] font-black uppercase tracking-wider opacity-40">
+            <p className="mt-5 text-center text-[10px] font-black uppercase tracking-wider opacity-140">
               Already a member?{" "}
               <Link
                 href="/sign-in"
-                className="text-[#2563EB] dark:text-[#3b82f6] opacity-100 hover:underline ml-1"
+                className="text-[#0854f7] dark:text-[#3b82f6]  hover:underline ml-1"
               >
                 Sign in
               </Link>
@@ -515,7 +502,7 @@ function FieldGroup({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-[10px] font-black uppercase tracking-widest opacity-50">{label}</label>
+      <label className="text-[10px] font-black uppercase tracking-widest opacity-150">{label}</label>
       <div className="relative group">
         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:opacity-80 group-focus-within:text-[#2563EB] transition-all">
           {icon}
@@ -524,7 +511,7 @@ function FieldGroup({
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-3.5 rounded-xl border-[2px] border-[#0A0A0A]/12 dark:border-white/10 bg-[#F7F7F7] dark:bg-white/[0.04] font-semibold text-sm focus:border-[#2563EB] focus:shadow-[3px_3px_0px_0px_#2563EB] outline-none transition-all placeholder:opacity-35 placeholder:text-xs"
+          className="w-full pl-10 pr-4 py-3.5 rounded-xl border-[2px] border-[#0A0A0A]/12 dark:border-white/10 bg-[#F7F7F7] dark:bg-white/[0.04] font-semibold text-sm focus:border-[#2563EB] focus:shadow-[3px_3px_0px_0px_#2563EB] outline-none transition-all placeholder:opacity-135 placeholder:text-xs"
           placeholder={placeholder}
           required
           autoComplete={autoComplete}
