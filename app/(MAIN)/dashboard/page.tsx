@@ -1,4 +1,4 @@
-import DashboardPage from "@/components/pages/DashboardPage";
+import DashboardPage from "@/components/pages/Main/DashboardPage";
 import type { Metadata } from "next";
 
 
