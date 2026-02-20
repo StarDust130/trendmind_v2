@@ -55,7 +55,7 @@ export const ThemeToggle = ({ size = "default" }: ThemeToggleProps) => {
             transition={{ duration: 0.15, ease: "easeOut" }}
             className="hidden md:block absolute top-full mt-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-[#0A0A0A] dark:bg-white text-white dark:text-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider whitespace-nowrap pointer-events-none z-[100] border-[2px] border-[#0A0A0A] dark:border-white/20 shadow-[2px_2px_0px_0px_#2563EB]"
           >
-            {isDark ? "Light Mode" : "Dark Mode"}
+            {isDark ? "Light Mode (Be Prepared 🫣)" : "Dark Mode"}
             <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0A0A0A] dark:bg-white rotate-45 border-l-[2px] border-t-[2px] border-[#0A0A0A] dark:border-white/20" />
           </motion.div>
         )}
